@@ -1,5 +1,5 @@
 {
-  "name": "GL PeerBridge-server",
+  "name": "GL PeerBajaj-server",
   "version": "1.0.0",
   "type": "module",
   "main": "src/index.js",
