@@ -13,28 +13,34 @@ import {
   deleteSection,
   addResource,
   updateResource,
-  deleteResource
+  deleteResource,
+  updateUser
 } from '../controllers/user.controller.js';
 
 const router = Router();
 
+// Users search/filter/suggest/follow – put these first
 router.get('/suggest', suggestUsers);
 router.get('/search', searchUsers);
 router.post('/filter', filterUsers);
 
-router.get('/:id', getUserById);
+// Follow/unfollow
 router.post('/:id/follow', authRequired, followUser);
 router.post('/:id/unfollow', authRequired, unfollowUser);
 
-// sections CRUD
-router.put('/:id/sections', authRequired, upsertSections);
+// Sections
 router.post('/:id/sections', authRequired, addSection);
+router.put('/:id/sections', authRequired, upsertSections); // update all sections at once
 router.put('/:id/sections/:sectionId', authRequired, updateSection);
 router.delete('/:id/sections/:sectionId', authRequired, deleteSection);
+
+// Resources
 router.post('/:id/sections/:sectionId/resources', authRequired, addResource);
-router.put('/:id/sections/:sectionId/resources/:resourceIndex', authRequired, updateResource);
-router.delete('/:id/sections/:sectionId/resources/:resourceIndex', authRequired, deleteResource);
+router.put('/:id/sections/:sectionId/resources/:resourceId', authRequired, updateResource);
+router.delete('/:id/sections/:sectionId/resources/:resourceId', authRequired, deleteResource);
+
+// User profile
+router.get('/:id', getUserById);
+router.put('/:id', authRequired, updateUser);
 
 export default router;
-
-
