@@ -136,7 +136,7 @@ export default function Dashboard() {
       [sectionId]: !prev[sectionId],
     }));
   };
-  
+
   return (
     <div className="space-y-6">
       {/* Profile Form */}
@@ -244,7 +244,11 @@ export default function Dashboard() {
                       </button>
                     </div>
                   </div>
-                  {s.description && <div className="text-sm text-gray-600">{s.description}</div>}
+                  {s.description && (
+                    <div className="text-sm text-gray-600 whitespace-pre-wrap">
+                      {s.description}
+                    </div>
+                  )}
 
                   {/* Resources cards */}
                   {viewingResources[s._id] && (
