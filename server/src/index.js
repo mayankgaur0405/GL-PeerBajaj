@@ -18,8 +18,10 @@ app.use(
     origin: function (origin, callback) {
       const allowedOrigins = [
         process.env.CLIENT_ORIGIN || "http://localhost:5173",
-        "https://gl-peer-bridge.vercel.app",
-        "https://gl-peer-bridge.vercel.app/"
+        "https://gl-peer-bajaj.vercel.app",
+        "https://gl-peer-bajaj.vercel.app/",
+        "http://localhost:5173",
+        "http://localhost:3000"
       ];
       
       // Allow requests with no origin (like mobile apps or curl requests)

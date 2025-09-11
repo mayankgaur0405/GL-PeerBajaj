@@ -14,5 +14,8 @@
       "src": "/(.*)",
       "dest": "/client/$1"
     }
-  ]
+  ],
+  "env": {
+    "VITE_API_BASE": "https://gl-peerbridge.onrender.com/api"
+  }
 }

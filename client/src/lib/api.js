@@ -1,7 +1,17 @@
 import axios from 'axios'
 
+// Determine API base URL based on environment
+const getApiBaseUrl = () => {
+  // Check if we're in production (Vercel deployment)
+  if (import.meta.env.PROD) {
+    return import.meta.env.VITE_API_BASE || 'https://gl-peerbridge.onrender.com/api'
+  }
+  // Development mode
+  return import.meta.env.VITE_API_BASE || 'http://localhost:5000/api'
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:5000/api',
+  baseURL: getApiBaseUrl(),
   withCredentials: true
 })
 
@@ -12,7 +22,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401 && !original._retry) {
       original._retry = true
       try {
-        await axios.post((import.meta.env.VITE_API_BASE || 'http://localhost:5000/api') + '/auth/refresh', {}, { withCredentials: true })
+        await axios.post(getApiBaseUrl() + '/auth/refresh', {}, { withCredentials: true })
         return api(original)
       } catch (_) {
         // fallthrough
