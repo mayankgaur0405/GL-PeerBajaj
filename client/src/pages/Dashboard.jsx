@@ -10,10 +10,7 @@ export default function Dashboard() {
   const [editingSectionId, setEditingSectionId] = useState(null);
   const [viewingResources, setViewingResources] = useState({}); // sectionId -> boolean
 
-  useEffect(() => {
-    setProfile(user);
-  }, [user]);
-
+  useEffect(() => setProfile(user), [user]);
   if (!profile) return null;
 
   const saveProfile = async () => {
@@ -31,13 +28,13 @@ export default function Dashboard() {
   };
 
   const addSection = async () => {
-    if (!newSection.title) return alert('Section title is required');
+    if (!newSection.title.trim()) return alert('Section title is required');
     try {
       const res = await api.post(`/users/${profile._id}/sections`, newSection);
       setProfile({ ...profile, sections: res.data.sections });
       setNewSection({ title: '', description: '' });
     } catch (err) {
-      console.error('Failed to add section:', err);
+      console.error(err);
       alert(err.response?.data?.message || 'Failed to add section');
     }
   };
@@ -48,7 +45,7 @@ export default function Dashboard() {
       const res = await api.delete(`/users/${profile._id}/sections/${sectionId}`);
       setProfile({ ...profile, sections: res.data.sections });
     } catch (err) {
-      console.error('Failed to delete section:', err);
+      console.error(err);
       alert(err.response?.data?.message || 'Failed to delete section');
     }
   };
@@ -64,16 +61,16 @@ export default function Dashboard() {
       });
       setEditingSectionId(null);
     } catch (err) {
-      console.error('Failed to save section:', err);
+      console.error(err);
       alert(err.response?.data?.message || 'Failed to save section');
     }
   };
 
   const addResource = async (sectionId) => {
-    const link = prompt('Resource link:');
+    const link = prompt('Resource link:')?.trim();
     if (!link) return alert('Link is required');
-    const description = prompt('Description (optional):') || '';
-    const img = prompt('Image URL (optional):') || '';
+    const description = prompt('Description (optional):')?.trim() || '';
+    const img = prompt('Image URL (optional):')?.trim() || '';
     try {
       const res = await api.post(
         `/users/${profile._id}/sections/${sectionId}/resources`,
@@ -86,16 +83,16 @@ export default function Dashboard() {
         ),
       });
     } catch (err) {
-      console.error('Failed to add resource:', err);
+      console.error(err);
       alert(err.response?.data?.message || 'Failed to add resource');
     }
   };
 
   const editResource = async (sectionId, resourceId, resource) => {
-    const link = prompt('Edit Resource link:', resource.link);
+    const link = prompt('Edit Resource link:', resource.link)?.trim();
     if (!link) return alert('Link is required');
-    const description = prompt('Edit description (optional):', resource.description || '') || '';
-    const img = prompt('Edit image URL (optional):', resource.img || '') || '';
+    const description = prompt('Edit description (optional):', resource.description || '')?.trim() || '';
+    const img = prompt('Edit image URL (optional):', resource.img || '')?.trim() || '';
     try {
       const res = await api.put(
         `/users/${profile._id}/sections/${sectionId}/resources/${resourceId}`,
@@ -108,7 +105,7 @@ export default function Dashboard() {
         ),
       });
     } catch (err) {
-      console.error('Failed to edit resource:', err);
+      console.error(err);
       alert(err.response?.data?.message || 'Failed to edit resource');
     }
   };
@@ -126,7 +123,7 @@ export default function Dashboard() {
         ),
       });
     } catch (err) {
-      console.error('Failed to delete resource:', err);
+      console.error(err);
       alert(err.response?.data?.message || 'Failed to delete resource');
     }
   };
@@ -140,10 +137,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Profile Form */}
       <ProfileForm profile={profile} setProfile={setProfile} saveProfile={saveProfile} saving={saving} />
-
-      {/* Sections */}
       <SectionsManager
         profile={profile}
         setProfile={setProfile}
@@ -164,6 +158,7 @@ export default function Dashboard() {
   );
 }
 
+// --- Profile Form ---
 function ProfileForm({ profile, setProfile, saveProfile, saving }) {
   return (
     <div className="bg-white rounded-xl shadow p-6">
@@ -194,6 +189,7 @@ function ProfileForm({ profile, setProfile, saveProfile, saving }) {
   );
 }
 
+// --- Sections Manager ---
 function SectionsManager({
   profile,
   setProfile,
@@ -231,7 +227,6 @@ function SectionsManager({
           />
         ))}
       </div>
-      {/* Add New Section */}
       <div className="border rounded p-3 grid md:grid-cols-3 gap-2">
         <input
           className="border rounded px-3 py-2"
@@ -256,6 +251,7 @@ function SectionsManager({
   );
 }
 
+// --- Section Card ---
 function SectionCard({
   section,
   profile,
@@ -270,31 +266,22 @@ function SectionCard({
   deleteResource
 }) {
   const isEditing = editingSectionId === section._id;
+  const [localTitle, setLocalTitle] = useState(section.title);
+  const [localDesc, setLocalDesc] = useState(section.description || '');
+
+  useEffect(() => {
+    setLocalTitle(section.title);
+    setLocalDesc(section.description || '');
+  }, [section]);
 
   return (
     <div className="border rounded p-3 space-y-2">
       {isEditing ? (
         <>
-          <input
-            className="w-full border px-2 py-1 font-medium"
-            value={section.title}
-            onChange={(e) =>
-              profile.sections.map((sec) =>
-                sec._id === section._id ? (sec.title = e.target.value) : sec
-              )
-            }
-          />
-          <textarea
-            className="w-full border rounded px-2 py-1 text-sm"
-            value={section.description || ''}
-            onChange={(e) =>
-              profile.sections.map((sec) =>
-                sec._id === section._id ? (sec.description = e.target.value) : sec
-              )
-            }
-          />
+          <input className="w-full border px-2 py-1 font-medium" value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} />
+          <textarea className="w-full border rounded px-2 py-1 text-sm" value={localDesc} onChange={(e) => setLocalDesc(e.target.value)} />
           <div className="flex gap-2">
-            <button onClick={() => saveSection(section._id, { title: section.title, description: section.description })} className="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
+            <button onClick={() => saveSection(section._id, { title: localTitle, description: localDesc })} className="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
             <button onClick={() => setEditingSectionId(null)} className="px-3 py-1 bg-gray-400 text-white rounded">Cancel</button>
           </div>
         </>
@@ -312,7 +299,6 @@ function SectionCard({
             </div>
           </div>
           {section.description && <div className="text-sm text-gray-600">{section.description}</div>}
-
           {viewingResources[section._id] && (
             <div className="grid md:grid-cols-2 gap-3 mt-2">
               {section.resources?.length ? section.resources.map((r) => (
@@ -337,6 +323,7 @@ function SectionCard({
   );
 }
 
+// --- Input Field ---
 function Field({ label, value, onChange }) {
   return (
     <div>
