@@ -298,7 +298,11 @@ function SectionCard({
               <button onClick={() => deleteSection(section._id)} className="text-sm px-3 py-1 bg-red-600 text-white rounded">Delete Section</button>
             </div>
           </div>
-          {section.description && <div className="text-sm text-gray-600">{section.description}</div>}
+          {section.description && (
+            <div className="text-sm text-gray-600 whitespace-pre-wrap">
+              {section.description}
+            </div>
+          )}
           {viewingResources[section._id] && (
             <div className="grid md:grid-cols-2 gap-3 mt-2">
               {section.resources?.length ? section.resources.map((r) => (
