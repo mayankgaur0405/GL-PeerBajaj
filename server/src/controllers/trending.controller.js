@@ -26,7 +26,8 @@ export async function getTrendingProfiles(req, res, next) {
         users = await User.getTrendingUsers(limitNum);
     }
 
-    res.json({ users });
+    // Return under "profiles" key to match client expectations
+    res.json({ profiles: users });
   } catch (err) {
     next(err);
   }
@@ -266,88 +267,79 @@ export async function getTopContributors(req, res, next) {
 export async function getTrendingData(req, res, next) {
   try {
     const { limit = 10 } = req.query;
+    const limitNum = parseInt(limit) || 10;
 
-    // Get trending profiles, sections, and posts in parallel
-    const [profiles, sections, posts, categories] = await Promise.all([
-      User.getTrendingUsers(parseInt(limit)),
-      getTrendingSections(req, res, next).then(() => {}), // This won't work as expected
-      Post.getTrendingPosts(parseInt(limit)),
-      getTrendingCategories(req, res, next).then(() => {}) // This won't work as expected
-    ]);
-
-    // Let's do this properly
-    const trendingSections = await Post.aggregate([
-      { 
-        $match: { 
-          type: 'section', 
-          isPublic: true,
-          'section.category': { $exists: true, $ne: null }
-        } 
-      },
-      {
-        $group: {
-          _id: '$section.category',
-          count: { $sum: 1 },
-          totalLikes: { $sum: { $size: '$likes' } },
-          totalComments: { $sum: { $size: '$comments' } },
-          totalShares: { $sum: { $size: '$shares' } }
-        }
-      },
-      {
-        $addFields: {
-          trendingScore: {
-            $add: [
-              { $multiply: ['$totalLikes', 1] },
-              { $multiply: ['$totalComments', 2] },
-              { $multiply: ['$totalShares', 3] },
-              { $multiply: ['$count', 0.5] }
-            ]
+    // Compute all segments in parallel without invoking other route handlers
+    const [profiles, posts, sections, categories] = await Promise.all([
+      User.getTrendingUsers(limitNum),
+      Post.getTrendingPosts(limitNum),
+      Post.aggregate([
+        { 
+          $match: { 
+            type: 'section', 
+            isPublic: true,
+            'section.category': { $exists: true, $ne: null }
+          } 
+        },
+        {
+          $group: {
+            _id: '$section.category',
+            count: { $sum: 1 },
+            totalLikes: { $sum: { $size: '$likes' } },
+            totalComments: { $sum: { $size: '$comments' } },
+            totalShares: { $sum: { $size: '$shares' } }
           }
-        }
-      },
-      { $sort: { trendingScore: -1 } },
-      { $limit: parseInt(limit) }
-    ]);
-
-    const trendingCategories = await Post.aggregate([
-      { 
-        $match: { 
-          type: 'section', 
-          isPublic: true,
-          'section.category': { $exists: true, $ne: null }
-        } 
-      },
-      {
-        $group: {
-          _id: '$section.category',
-          postCount: { $sum: 1 },
-          totalLikes: { $sum: { $size: '$likes' } },
-          totalComments: { $sum: { $size: '$comments' } },
-          totalShares: { $sum: { $size: '$shares' } }
-        }
-      },
-      {
-        $addFields: {
-          trendingScore: {
-            $add: [
-              { $multiply: ['$totalLikes', 1] },
-              { $multiply: ['$totalComments', 2] },
-              { $multiply: ['$totalShares', 3] },
-              { $multiply: ['$postCount', 0.5] }
-            ]
+        },
+        {
+          $addFields: {
+            trendingScore: {
+              $add: [
+                { $multiply: ['$totalLikes', 1] },
+                { $multiply: ['$totalComments', 2] },
+                { $multiply: ['$totalShares', 3] },
+                { $multiply: ['$count', 0.5] }
+              ]
+            }
           }
-        }
-      },
-      { $sort: { trendingScore: -1 } },
-      { $limit: parseInt(limit) }
+        },
+        { $sort: { trendingScore: -1 } },
+        { $limit: limitNum }
+      ]),
+      Post.aggregate([
+        { 
+          $match: { 
+            type: 'section', 
+            isPublic: true,
+            'section.category': { $exists: true, $ne: null }
+          } 
+        },
+        {
+          $group: {
+            _id: '$section.category',
+            postCount: { $sum: 1 },
+            totalLikes: { $sum: { $size: '$likes' } },
+            totalComments: { $sum: { $size: '$comments' } },
+            totalShares: { $sum: { $size: '$shares' } }
+          }
+        },
+        {
+          $addFields: {
+            trendingScore: {
+              $add: [
+                { $multiply: ['$totalLikes', 1] },
+                { $multiply: ['$totalComments', 2] },
+                { $multiply: ['$totalShares', 3] },
+                { $multiply: ['$postCount', 0.5] }
+              ]
+            }
+          }
+        },
+        { $sort: { trendingScore: -1 } },
+        { $limit: limitNum }
+      ])
     ]);
 
-    res.json({
-      profiles,
-      sections: trendingSections,
-      posts,
-      categories: trendingCategories
-    });
+    res.json({ profiles, sections, posts, categories });
   } catch (err) {
     next(err);
   }

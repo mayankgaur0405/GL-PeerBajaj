@@ -59,7 +59,7 @@ export default function Trending() {
     if (!user) return;
     
     try {
-      await api.post(`/users/${userId}/follow`);
+      await apiClient.post(`/users/${userId}/follow`);
       // Update local state
       setTrendingData(prev => ({
         ...prev,
@@ -78,7 +78,7 @@ export default function Trending() {
     if (!user) return;
     
     try {
-      await api.post(`/users/${userId}/unfollow`);
+      await apiClient.post(`/users/${userId}/unfollow`);
       // Update local state
       setTrendingData(prev => ({
         ...prev,

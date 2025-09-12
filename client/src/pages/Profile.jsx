@@ -9,7 +9,14 @@ export default function Profile() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
-  const [showResources, setShowResources] = useState({}) // sectionId -> boolean
+
+  // Tabs for categorized posts on profile (keep hooks before any early returns)
+  const [activeTab, setActiveTab] = useState('section')
+  const filtersByTab = useMemo(() => ({
+    section: { type: 'section' },
+    text: { type: 'text' },
+    image: { type: 'image' }
+  }), [])
 
   useEffect(() => {
     async function load() {
@@ -42,20 +49,7 @@ export default function Profile() {
   const amFollowing =
     user && profile.followers?.some((u) => (u._id || u) === user._id)
 
-  const toggleResources = (sectionId) => {
-    setShowResources((prev) => ({
-      ...prev,
-      [sectionId]: !prev[sectionId],
-    }))
-  }
-
-  // Tabs for categorized posts on profile
-  const [activeTab, setActiveTab] = useState('section')
-  const filtersByTab = useMemo(() => ({
-    section: { type: 'section' },
-    text: { type: 'text' },
-    image: { type: 'image' }
-  }), [])
+  // sections feature removed
 
   return (
     <div className="space-y-6">
@@ -91,68 +85,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="space-y-4">
-        {profile.sections?.length ? (
-          profile.sections.map((s) => (
-            <div
-              key={s._id}
-              className="glass-card p-4 space-y-2"
-            >
-              <h4 className="font-semibold text-lg">{s.title}</h4>
-              {s.description && (
-                <div className="text-gray-600 whitespace-pre-wrap text-sm">
-                  {s.description}
-                </div>
-              )}
-
-              <button
-                onClick={() => toggleResources(s._id)}
-                className="text-sm text-blue-600 underline"
-              >
-                {showResources[s._id] ? 'Hide Resources' : 'View Resources'}
-              </button>
-
-              {showResources[s._id] && (
-                s.resources?.length > 0 ? (
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    {s.resources.map((r, idx) => (
-                      <a
-                        key={idx}
-                        href={r.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="border rounded p-3 hover:bg-gray-50 flex items-center gap-3"
-                      >
-                        {r.img ? (
-                          <img
-                            src={r.img}
-                            alt={r.description || 'resource'}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 bg-gray-200 rounded" />
-                        )}
-                        <div>
-                          <div className="font-medium line-clamp-1">
-                            {r.description || r.link}
-                          </div>
-                          <div className="text-sm text-gray-500 line-clamp-1">
-                            {r.link}
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-400">No resources yet</p>
-                )
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="text-gray-600">No sections yet.</div>
-        )}
-      </div>
+      {/* Sections feature removed from profile view */}
 
       {/* Categorized Posts */}
       <div className="glass-card p-6 space-y-4">

@@ -7,13 +7,6 @@ import {
   suggestUsers,
   followUser,
   unfollowUser,
-  upsertSections,
-  addSection,
-  updateSection,
-  deleteSection,
-  addResource,
-  updateResource,
-  deleteResource,
   updateUser
 } from '../controllers/user.controller.js';
 
@@ -28,16 +21,7 @@ router.post('/filter', filterUsers);
 router.post('/:id/follow', authRequired, followUser);
 router.post('/:id/unfollow', authRequired, unfollowUser);
 
-// Sections
-router.post('/:id/sections', authRequired, addSection);
-router.put('/:id/sections', authRequired, upsertSections); // update all sections at once
-router.put('/:id/sections/:sectionId', authRequired, updateSection);
-router.delete('/:id/sections/:sectionId', authRequired, deleteSection);
-
-// Resources
-router.post('/:id/sections/:sectionId/resources', authRequired, addResource);
-router.put('/:id/sections/:sectionId/resources/:resourceId', authRequired, updateResource);
-router.delete('/:id/sections/:sectionId/resources/:resourceId', authRequired, deleteResource);
+// Sections/resources feature removed
 
 // User profile
 router.get('/:id', getUserById);

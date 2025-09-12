@@ -24,40 +24,7 @@ export default function ProfileCard({ user }) {
         {user.department} • {user.specialization}
       </div>
 
-      {/* Sections */}
-      {user.sections?.length > 0 && (
-        <div className="mt-4 space-y-3">
-          <h4 className="font-medium text-gray-800">Sections</h4>
-          {user.sections.map((section) => (
-            <div key={section._id} className="border rounded p-2">
-              <div className="font-semibold">{section.title}</div>
-              {section.description && (
-                <p className="text-sm text-gray-600">{section.description}</p>
-              )}
-
-              {/* Resources */}
-              {section.resources?.length ? (
-                <ul className="list-disc ml-5 mt-1 text-sm">
-                  {section.resources.map((r, idx) => (
-                    <li key={idx}>
-                      <a
-                        href={r.link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600"
-                      >
-                        {r.description || r.link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-gray-400">No resources yet</p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Sections feature removed */}
 
       {/* View Profile Button */}
       <Link

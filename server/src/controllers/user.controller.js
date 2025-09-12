@@ -110,136 +110,25 @@ export async function unfollowUser(req, res, next) {
 }
 
 // UPSERT SECTIONS
-export async function upsertSections(req, res, next) {
-  try {
-    const { id } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const { sections } = req.body;
-    const user = await User.findByIdAndUpdate(id, { sections }, { new: true }).select(
-      '-password'
-    );
-    res.json({ user });
-  } catch (err) {
-    next(err);
-  }
-}
+// Sections feature removed
 
 // ADD SECTION
-export async function addSection(req, res, next) {
-  try {
-    const { id } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const { title, description } = req.body;
-    const user = await User.findById(id);
-    user.sections.push({ title, description, resources: [] });
-    await user.save();
-    res.status(201).json({ sections: user.sections });
-  } catch (err) {
-    next(err);
-  }
-}
+// Sections feature removed
 
 // DELETE SECTION
-export async function deleteSection(req, res, next) {
-  try {
-    const { id, sectionId } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const user = await User.findById(id);
-    const section = user.sections.id(sectionId);
-    if (!section) return res.status(404).json({ message: 'Section not found' });
-    section.remove();
-    await user.save();
-    res.json({ sections: user.sections });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error while deleting section' });
-  }
-}
+// Sections feature removed
 
 // ADD RESOURCE
-export async function addResource(req, res, next) {
-  try {
-    const { id, sectionId } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const { img = '', link, description = '' } = req.body;
-    if (!link) return res.status(400).json({ message: 'Link is required' });
-
-    const user = await User.findById(id);
-    const section = user.sections.id(sectionId);
-    if (!section) return res.status(404).json({ message: 'Section not found' });
-    section.resources.push({ img, link, description });
-    await user.save();
-    res.status(201).json({ section });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error while adding resource' });
-  }
-}
+// Sections feature removed
 
 // UPDATE SECTION
-export async function updateSection(req, res, next) {
-  try {
-    const { id, sectionId } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const { title, description } = req.body;
-    const user = await User.findById(id);
-    const section = user.sections.id(sectionId);
-    if (!section) return res.status(404).json({ message: 'Section not found' });
-    if (title !== undefined) section.title = title;
-    if (description !== undefined) section.description = description;
-    await user.save();
-    res.json({ section });
-  } catch (err) {
-    next(err);
-  }
-}
+// Sections feature removed
 
 // UPDATE RESOURCE
-export async function updateResource(req, res, next) {
-  try {
-    const { id, sectionId, resourceId } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const { img, link, description } = req.body;
-    const user = await User.findById(id);
-    const section = user.sections.id(sectionId);
-    if (!section) return res.status(404).json({ message: 'Section not found' });
-    const resource = section.resources.id(resourceId);
-    if (!resource) return res.status(404).json({ message: 'Resource not found' });
-    if (img !== undefined) resource.img = img;
-    if (link !== undefined) resource.link = link;
-    if (description !== undefined) resource.description = description;
-    await user.save();
-    res.json({ section });
-  } catch (err) {
-    next(err);
-  }
-}
+// Sections feature removed
 
 // DELETE RESOURCE
-export async function deleteResource(req, res, next) {
-  try {
-    const { id, sectionId, resourceId } = req.params;
-    if (id !== req.userId)
-      return res.status(403).json({ message: 'Forbidden' });
-    const user = await User.findById(id);
-    const section = user.sections.id(sectionId);
-    if (!section) return res.status(404).json({ message: 'Section not found' });
-    const resource = section.resources.id(resourceId);
-    if (!resource) return res.status(404).json({ message: 'Resource not found' });
-    resource.remove();
-    await user.save();
-    res.json({ section });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error while deleting resource' });
-  }
-}
+// Sections feature removed
 
 // UPDATE USER
 export async function updateUser(req, res, next) {

@@ -27,7 +27,7 @@ export default function Home() {
   const loadSuggestions = async () => {
     setLoading(true)
     try {
-      const res = await api.get('/users/suggest?limit=8')
+      const res = await apiClient.get('/users/suggest?limit=8')
       setUsers(res.data.users)
     } finally {
       setLoading(false)
