@@ -352,31 +352,48 @@ export function ReviewsSection() {
 
 export function FeedbackSection() {
   const feedback = [
-    { name: 'Aarav Sharma', role: 'CSE, Year 3', text: 'GL PeerBajaj helped me find exactly what to study for placements. The community is super helpful.' },
-    { name: 'Isha Verma', role: 'ECE, Year 2', text: 'The resources are neatly organized. I love the dark theme and the clean UI!' },
-    { name: 'Rohit Mehra', role: 'AIML, Year 4', text: 'Discussions and quick feedback kept me consistent. Highly recommended.' },
-    { name: 'Sara Khan', role: 'IT, Year 1', text: 'As a beginner, it felt easy to start. The platform made learning less overwhelming.' }
+    { name: 'Aarav Sharma', role: 'CSE, Year 3', text: 'Found exactly what to study for placements. The community is super helpful.', rating: 5 },
+    { name: 'Isha Verma', role: 'ECE, Year 2', text: 'Neatly organized resources. Dark theme and clean UI are great!', rating: 5 },
+    { name: 'Rohit Mehra', role: 'AIML, Year 4', text: 'Discussions and quick feedback kept me consistent. Highly recommended.', rating: 5 },
+    { name: 'Sara Khan', role: 'IT, Year 1', text: 'As a beginner it felt easy to start. Learning is less overwhelming now.', rating: 4 }
   ]
   return (
-    <section id="feedback" className="space-y-4 section-wrap">
+    <section id="feedback" className="space-y-6 section-wrap">
       <div className="section-header">
-        <span className="section-badge">⭐</span>
-        <h3 className="text-white font-semibold">What do students say about GL PeerBajaj?</h3>
+        <span className="section-badge">🌟</span>
+        <h3 className="text-white font-semibold">What students say about GL PeerBajaj</h3>
       </div>
-      <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Featured quote */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900 p-6">
+        <div className="absolute -top-10 -left-6 text-7xl opacity-10">“</div>
+        <blockquote className="text-white/90 text-lg md:text-xl leading-relaxed">
+          “A focused place to learn with peers. I spend less time searching and more time practicing.”
+        </blockquote>
+        <div className="mt-3 text-white/60 text-sm">— Community Feedback</div>
+      </div>
+      {/* Testimonials grid */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {feedback.map((f, i) => (
-          <div key={i} className="glass-card p-5 text-white hover-glow hover-raise">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">{f.name.charAt(0)}</div>
-              <div>
-                <div className="font-medium">{f.name}</div>
-                <div className="text-xs text-white/70">{f.role}</div>
+          <div key={i} className="group relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-rose-500/30">
+            <div className="h-full w-full rounded-2xl bg-slate-900 p-5 text-white">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center ring-1 ring-white/10">{f.name.charAt(0)}</div>
+                <div>
+                  <div className="font-medium">{f.name}</div>
+                  <div className="text-xs text-white/60">{f.role}</div>
+                </div>
               </div>
+              <div className="flex gap-1 mb-2">
+                {Array.from({ length: f.rating }).map((_, idx) => (<span key={idx}>⭐</span>))}
+              </div>
+              <p className="text-white/80 text-sm leading-relaxed">{f.text}</p>
             </div>
-            <div className="flex gap-1 mb-2">{'★★★★★'.split('').map((s, idx)=>(<span key={idx}>⭐</span>))}</div>
-            <p className="text-white/80 text-sm leading-relaxed">{f.text}</p>
           </div>
         ))}
+      </div>
+      <div className="flex items-center justify-between gap-3 text-white/70 text-sm">
+        <div>Have feedback for us?</div>
+        <a href="#" className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white border border-white/10">Share Feedback</a>
       </div>
     </section>
   )
@@ -509,8 +526,8 @@ export default function Extras() {
       <InternshipSection />
       <PlatformFeaturesSection />
       <ReviewsSection />
-      <FeedbackSection />
       <CareerSection />
+      <FeedbackSection />
       <FooterSection />
     </div>
   )
