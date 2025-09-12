@@ -12,7 +12,7 @@ import TrendingResourceCard from '../components/TrendingResourceCard.jsx'
 import { topContributors as fallbackContributors, trendingResources } from '../data/homeShowcase.js'
 import Feed from '../components/Feed.jsx'
 import StudyMaterials from '../components/StudyMaterials.jsx'
-import Extras, { PlacementPrepSection, AboutSection, BenefitsSection, CareerSection, InternshipSection, PlatformFeaturesSection, ReviewsSection, FooterSection, HeroSection, FeedbackSection } from '../components/Extras.jsx'
+import Extras, { PlacementPrepSection, AboutSection, BenefitsSection, CareerSection, InternshipSection, PlatformFeaturesSection, FooterSection, HeroSection, FeedbackSection } from '../components/Extras.jsx'
 
 export default function Home() {
   const { user } = useAuth()
@@ -242,7 +242,6 @@ export default function Home() {
         <div className="snap-start"><BenefitsSection /></div>
         <div className="snap-start"><InternshipSection /></div>
         <div className="snap-start"><PlatformFeaturesSection /></div>
-        <div className="snap-start"><ReviewsSection /></div>
         <div className="snap-start"><CareerSection /></div>
         <div className="snap-start"><FeedbackSection /></div>
         <div className="snap-start"><FooterSection /></div>

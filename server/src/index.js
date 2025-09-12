@@ -63,6 +63,12 @@ app.use(express.json({ limit: "10mb" })); // Increased for image uploads
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+// Socket middleware to pass io instance to routes
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 // Routes
 app.get("/", (req, res) => {
   res.send("connected to server");

@@ -38,7 +38,22 @@ export default function ChatBox({ chatId, onClose }) {
       // Listen for new messages
       socket.on('new_message', (data) => {
         if (data.chatId === chatId) {
-          setMessages(prev => [...prev, data.message]);
+          setMessages(prev => {
+            // Check if this is our own message (replace optimistic message)
+            const isOwnMessage = data.message.sender._id === user._id;
+            
+            if (isOwnMessage) {
+              // Replace optimistic message with real message
+              return prev.map(msg => 
+                msg.isOptimistic && msg.content === data.message.content
+                  ? data.message
+                  : msg
+              );
+            } else {
+              // Add new message from other user
+              return [...prev, data.message];
+            }
+          });
         }
       });
 
@@ -74,25 +89,55 @@ export default function ChatBox({ chatId, onClose }) {
     e.preventDefault();
     if (!newMessage.trim() || sending) return;
 
+    const messageContent = newMessage.trim();
+    setNewMessage('');
+    stopTyping();
     setSending(true);
+
+    // Create optimistic message for immediate UI update
+    const optimisticMessage = {
+      _id: `temp_${Date.now()}`,
+      content: messageContent,
+      sender: {
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        profilePicture: user.profilePicture
+      },
+      createdAt: new Date().toISOString(),
+      isOptimistic: true
+    };
+
+    // Add optimistic message immediately
+    setMessages(prev => [...prev, optimisticMessage]);
+
     try {
       if (socket) {
         socket.emit('send_message', {
           chatId,
-          content: newMessage.trim(),
+          content: messageContent,
           type: 'text'
         });
       } else {
         // Fallback to API call
-        await api.post(`/chat/${chatId}/messages`, {
-          content: newMessage.trim(),
+        const response = await api.post(`/chat/${chatId}/messages`, {
+          content: messageContent,
           type: 'text'
         });
+        
+        // Replace optimistic message with real message
+        setMessages(prev => 
+          prev.map(msg => 
+            msg._id === optimisticMessage._id 
+              ? response.data.message 
+              : msg
+          )
+        );
       }
-      setNewMessage('');
-      stopTyping();
     } catch (err) {
       console.error('Failed to send message:', err);
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg._id !== optimisticMessage._id));
     } finally {
       setSending(false);
     }
@@ -191,13 +236,13 @@ export default function ChatBox({ chatId, onClose }) {
                 message.sender._id === user?._id
                   ? 'bg-blue-600 text-white'
                   : 'bg-white/10 text-white'
-              }`}
+              } ${message.isOptimistic ? 'opacity-70' : ''}`}
             >
               <p className="text-sm">{message.content}</p>
               <p className={`text-xs mt-1 ${
                 message.sender._id === user?._id ? 'text-blue-100' : 'text-white/60'
               }`}>
-                {formatTime(message.createdAt)}
+                {message.isOptimistic ? 'Sending...' : formatTime(message.createdAt)}
               </p>
             </div>
           </div>

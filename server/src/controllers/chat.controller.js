@@ -137,6 +137,23 @@ export async function sendMessage(req, res, next) {
 
     const newMessage = chat.messages[chat.messages.length - 1];
 
+    // Emit socket events for real-time updates
+    if (req.io) {
+      // Emit to all participants in the chat
+      req.io.to(`chat_${chatId}`).emit('new_message', {
+        chatId,
+        message: newMessage
+      });
+
+      // Emit notification to the other participant
+      if (otherParticipant) {
+        req.io.to(`user_${otherParticipant}`).emit('new_notification', {
+          type: 'chat',
+          message: 'New message received'
+        });
+      }
+    }
+
     res.status(201).json({ 
       message: newMessage,
       chat 
