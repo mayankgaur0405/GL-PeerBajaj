@@ -55,17 +55,17 @@ export default function UserSuggestions() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border p-6">
-        <h3 className="text-lg font-semibold mb-4">Suggested for you</h3>
+      <div className="bg-white/10 border border-white/10 rounded-2xl p-6">
+        <h3 className="text-white text-lg font-semibold mb-4">Suggested for you</h3>
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center space-x-3 animate-pulse">
-              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+            <div key={i} className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full"></div>
               <div className="flex-1">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-white/20 rounded w-3/4 mb-1"></div>
+                <div className="h-3 bg-white/20 rounded w-1/2"></div>
               </div>
-              <div className="w-16 h-8 bg-gray-200 rounded"></div>
+              <div className="w-16 h-8 bg-white/20 rounded"></div>
             </div>
           ))}
         </div>
@@ -83,15 +83,10 @@ export default function UserSuggestions() {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-6">
+    <div className="bg-white/10 border border-white/10 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">Suggested for you</h3>
-        <button
-          onClick={handleShuffle}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-        >
-          Shuffle
-        </button>
+        <h3 className="text-white text-lg font-semibold">Suggested for you</h3>
+        <button onClick={handleShuffle} className="text-sm text-blue-400 hover:text-blue-300 font-medium">Shuffle</button>
       </div>
       
       <div className="space-y-3">
@@ -100,25 +95,25 @@ export default function UserSuggestions() {
           const isCurrentUser = suggestion._id === user?._id;
           
           return (
-            <div key={suggestion._id} className="flex items-center space-x-3">
+            <div key={suggestion._id} className="flex items-center space-x-3 transition transform hover:scale-[1.01]">
               <img
                 src={suggestion.profilePicture || '/default-avatar.png'}
                 alt={suggestion.name}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-sm truncate">{suggestion.name}</h4>
-                <p className="text-xs text-gray-500 truncate">@{suggestion.username}</p>
+                <h4 className="text-white font-medium text-sm truncate">{suggestion.name}</h4>
+                <p className="text-xs text-white/60 truncate">@{suggestion.username}</p>
                 {suggestion.bio && (
-                  <p className="text-xs text-gray-600 truncate mt-1">{suggestion.bio}</p>
+                  <p className="text-xs text-white/60 truncate mt-1">{suggestion.bio}</p>
                 )}
               </div>
               {!isCurrentUser && (
                 <button
                   onClick={() => isFollowing ? handleUnfollow(suggestion._id) : handleFollow(suggestion._id)}
-                  className={`px-3 py-1 text-xs rounded-full font-medium transition-colors ${
+                  className={`px-3 py-1 text-xs rounded-full font-medium transition-colors btn-glow ${
                     isFollowing
-                      ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      ? 'bg-white/20 text-white hover:bg-white/30'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
                   }`}
                 >

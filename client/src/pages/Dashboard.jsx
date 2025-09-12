@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import api from '../lib/api.js';
+import Feed from '../components/Feed.jsx';
 
 export default function Dashboard() {
   const { user, setUser } = useAuth();
@@ -15,6 +16,14 @@ export default function Dashboard() {
   }, [user]);
 
   if (!profile) return null;
+
+  // Tabs for categorized posts
+  const [activeTab, setActiveTab] = useState('section');
+  const filtersByTab = useMemo(() => ({
+    section: { type: 'section' },
+    text: { type: 'text' },
+    image: { type: 'image' }
+  }), []);
 
   const saveProfile = async () => {
     setSaving(true);
@@ -140,7 +149,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       {/* Profile Form */}
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="glass-card p-6">
         <h1 className="text-xl font-semibold mb-4">Edit Profile</h1>
         <div className="grid md:grid-cols-2 gap-3">
           <Field label="Name" value={profile.name} onChange={(v) => setProfile({ ...profile, name: v })} />
@@ -167,7 +176,7 @@ export default function Dashboard() {
       </div>
 
       {/* Sections */}
-      <div className="bg-white rounded-xl shadow p-6 space-y-4">
+      <div className="glass-card p-6 space-y-4">
         <h2 className="text-lg font-semibold">Sections</h2>
         <div className="grid gap-3">
           {profile.sections?.map((s) => (
@@ -324,6 +333,27 @@ export default function Dashboard() {
             Add Section
           </button>
         </div>
+      </div>
+
+      {/* Posts categorized like feed */}
+      <div className="glass-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold">Your Posts</h2>
+        <div className="tab-group w-full md:w-auto">
+          {[
+            { key: 'section', label: 'Sections/Roadmaps' },
+            { key: 'text', label: 'Blogs/Text' },
+            { key: 'image', label: 'Images' }
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`tab-btn ${activeTab === t.key ? 'tab-btn-active' : ''}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <Feed type="user" userId={profile._id} filters={filtersByTab[activeTab]} />
       </div>
     </div>
   )

@@ -139,7 +139,7 @@ export default function ChatBox({ chatId, onClose }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
       </div>
     );
   }
@@ -155,9 +155,9 @@ export default function ChatBox({ chatId, onClose }) {
   const otherUser = getOtherUser();
 
   return (
-    <div className="flex flex-col h-96 bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col h-96 glass-card">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b glass-divider">
         <div className="flex items-center space-x-3">
           <img 
             src={otherUser?.profilePicture || '/default-avatar.png'} 
@@ -165,13 +165,13 @@ export default function ChatBox({ chatId, onClose }) {
             className="w-8 h-8 rounded-full object-cover"
           />
           <div>
-            <h3 className="font-semibold">{otherUser?.name}</h3>
-            <p className="text-sm text-gray-500">@{otherUser?.username}</p>
+            <h3 className="font-semibold text-white">{otherUser?.name}</h3>
+            <p className="text-sm text-white/60">@{otherUser?.username}</p>
           </div>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-white/60 hover:text-white"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -190,12 +190,12 @@ export default function ChatBox({ chatId, onClose }) {
               className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                 message.sender._id === user?._id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                  : 'bg-white/10 text-white'
               }`}
             >
               <p className="text-sm">{message.content}</p>
               <p className={`text-xs mt-1 ${
-                message.sender._id === user?._id ? 'text-blue-100' : 'text-gray-500'
+                message.sender._id === user?._id ? 'text-blue-100' : 'text-white/60'
               }`}>
                 {formatTime(message.createdAt)}
               </p>
@@ -219,20 +219,20 @@ export default function ChatBox({ chatId, onClose }) {
       </div>
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t">
+      <form onSubmit={handleSendMessage} className="p-4 border-t glass-divider">
         <div className="flex space-x-2">
           <input
             type="text"
             value={newMessage}
             onChange={handleTyping}
             placeholder="Type a message..."
-            className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-900 text-white placeholder-white/50 border-white/10"
             disabled={sending}
           />
           <button
             type="submit"
             disabled={!newMessage.trim() || sending}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 btn-glow"
           >
             {sending ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

@@ -4,7 +4,8 @@ import {
   getTrendingSections,
   getTrendingPosts,
   getTrendingCategories,
-  getTrendingData
+  getTrendingData,
+  getTopContributors
 } from '../controllers/trending.controller.js';
 
 const router = Router();
@@ -14,6 +15,7 @@ router.get('/profiles', getTrendingProfiles);
 router.get('/sections', getTrendingSections);
 router.get('/posts', getTrendingPosts);
 router.get('/categories', getTrendingCategories);
+router.get('/contributors', getTopContributors);
 router.get('/', getTrendingData);
 
 export default router;

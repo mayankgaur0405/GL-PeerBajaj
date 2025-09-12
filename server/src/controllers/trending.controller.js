@@ -188,6 +188,80 @@ export async function getTrendingCategories(req, res, next) {
   }
 }
 
+// GET TOP CONTRIBUTORS (Leaderboard)
+export async function getTopContributors(req, res, next) {
+  try {
+    let { limit = 6 } = req.query;
+    limit = Math.min(parseInt(limit) || 5, 50);
+
+    const results = await Post.aggregate([
+      { $match: { isPublic: true } },
+      {
+        $project: {
+          author: 1,
+          likesCount: { $size: { $ifNull: ['$likes', []] } },
+          commentsCount: { $size: { $ifNull: ['$comments', []] } },
+          sharesCount: { $size: { $ifNull: ['$shares', []] } }
+        }
+      },
+      {
+        $group: {
+          _id: '$author',
+          posts: { $sum: 1 },
+          likes: { $sum: '$likesCount' },
+          comments: { $sum: '$commentsCount' },
+          shares: { $sum: '$sharesCount' }
+        }
+      },
+      {
+        $project: {
+          posts: 1,
+          likes: 1,
+          comments: 1,
+          shares: 1,
+          score: {
+            $add: [
+              { $multiply: ['$posts', 5] },
+              { $multiply: ['$likes', 1] },
+              { $multiply: ['$comments', 2] },
+              { $multiply: ['$shares', 3] }
+            ]
+          }
+        }
+      },
+      { $sort: { score: -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      { $unwind: '$user' },
+      {
+        $project: {
+          _id: 0,
+          userId: '$user._id',
+          name: '$user.name',
+          username: '$user.username',
+          avatar: '$user.profilePicture',
+          contributions: '$score',
+          posts: 1,
+          likes: 1,
+          comments: 1,
+          shares: 1
+        }
+      }
+    ]);
+
+    res.json({ contributors: results });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // GET OVERALL TRENDING DATA
 export async function getTrendingData(req, res, next) {
   try {

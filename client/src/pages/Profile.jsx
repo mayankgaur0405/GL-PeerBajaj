@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import api from '../lib/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import Feed from '../components/Feed.jsx'
 
 export default function Profile() {
   const { id } = useParams()
@@ -48,9 +49,17 @@ export default function Profile() {
     }))
   }
 
+  // Tabs for categorized posts on profile
+  const [activeTab, setActiveTab] = useState('section')
+  const filtersByTab = useMemo(() => ({
+    section: { type: 'section' },
+    text: { type: 'text' },
+    image: { type: 'image' }
+  }), [])
+
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="glass-card p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold">{profile.name}</h1>
@@ -87,7 +96,7 @@ export default function Profile() {
           profile.sections.map((s) => (
             <div
               key={s._id}
-              className="bg-white rounded-xl shadow p-4 space-y-2"
+              className="glass-card p-4 space-y-2"
             >
               <h4 className="font-semibold text-lg">{s.title}</h4>
               {s.description && (
@@ -143,6 +152,27 @@ export default function Profile() {
         ) : (
           <div className="text-gray-600">No sections yet.</div>
         )}
+      </div>
+
+      {/* Categorized Posts */}
+      <div className="glass-card p-6 space-y-4">
+        <h2 className="text-lg font-semibold">Posts</h2>
+        <div className="tab-group w-full md:w-auto">
+          {[
+            { key: 'section', label: 'Sections/Roadmaps' },
+            { key: 'text', label: 'Blogs/Text' },
+            { key: 'image', label: 'Images' }
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`tab-btn ${activeTab === t.key ? 'tab-btn-active' : ''}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <Feed type="user" userId={profile._id} filters={filtersByTab[activeTab]} />
       </div>
     </div>
   )

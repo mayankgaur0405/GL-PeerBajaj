@@ -49,15 +49,15 @@ export default function Navbar() {
   }
 
   return (
-    <header className="bg-white border-b sticky top-0 z-40">
+    <header className="backdrop-blur bg-slate-900/70 border-b border-white/10 sticky top-0 z-40">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="font-bold text-xl">GL PeerBajaj</Link>
+        <Link to="/" className="font-bold text-xl text-white">GL PeerBajaj</Link>
         
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-6 text-white">
           <NavLink 
             to="/" 
             className={({ isActive }) => 
-              `flex items-center space-x-1 ${isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`
+              `flex items-center space-x-1 transition-base ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
             }
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@ export default function Navbar() {
               <NavLink 
                 to="/feed" 
                 className={({ isActive }) => 
-                  `flex items-center space-x-1 ${isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`
+                  `flex items-center space-x-1 transition-base ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
                 }
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@ export default function Navbar() {
               <NavLink 
                 to="/trending" 
                 className={({ isActive }) => 
-                  `flex items-center space-x-1 ${isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`
+                  `flex items-center space-x-1 transition-base ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
                 }
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ export default function Navbar() {
 
               <Link 
                 to="/chat" 
-                className="relative flex items-center space-x-1 text-gray-700 hover:text-blue-600"
+                className="relative flex items-center space-x-1 text-white/80 hover:text-blue-400 transition-base"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -109,7 +109,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => setShowNotifications(true)}
-                className="relative flex items-center space-x-1 text-gray-700 hover:text-blue-600"
+                className="relative flex items-center space-x-1 text-white/80 hover:text-blue-400 transition-base"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM4 7h6V5H4v2zM4 13h6v-2H4v2z" />
@@ -125,7 +125,7 @@ export default function Navbar() {
               <NavLink 
                 to="/dashboard" 
                 className={({ isActive }) => 
-                  `flex items-center space-x-1 ${isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}`
+                  `flex items-center space-x-1 transition-base ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
                 }
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,11 +142,11 @@ export default function Navbar() {
                     alt={user.name}
                     className="w-8 h-8 rounded-full object-cover"
                   />
-                  <span className="text-sm font-medium">{user.name}</span>
+                  <span className="text-sm font-medium text-white/90">{user.name}</span>
                 </Link>
                 <button 
                   onClick={logout} 
-                  className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                  className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-sm transition-base"
                 >
                   Logout
                 </button>
@@ -154,8 +154,8 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <NavLink to="/login" className={({ isActive }) => isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}>Login</NavLink>
-              <NavLink to="/signup" className={({ isActive }) => isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'}>Signup</NavLink>
+              <NavLink to="/login" className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}>Login</NavLink>
+              <NavLink to="/signup" className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}>Signup</NavLink>
             </>
           )}
         </nav>

@@ -1,8 +1,12 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 export default function ProfileCard({ user }) {
+  const navigate = useNavigate()
   return (
-    <div className="bg-white rounded-xl shadow p-4 flex flex-col">
+    <div
+      className="bg-white/80 backdrop-blur rounded-xl shadow hover:shadow-lg transition-shadow p-4 flex flex-col cursor-pointer"
+      onClick={() => navigate(`/profile/${user._id}`)}
+    >
       {/* Top Info */}
       <div className="flex items-center justify-between">
         <div>
@@ -58,7 +62,8 @@ export default function ProfileCard({ user }) {
       {/* View Profile Button */}
       <Link
         to={`/profile/${user._id}`}
-        className="mt-4 px-3 py-2 rounded bg-blue-600 text-white text-center"
+        onClick={(e) => e.stopPropagation()}
+        className="mt-4 px-3 py-2 rounded bg-blue-600 text-white text-center hover:bg-blue-700 transition-colors"
       >
         View Profile
       </Link>

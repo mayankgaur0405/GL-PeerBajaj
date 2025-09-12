@@ -115,26 +115,26 @@ export default function Chat() {
     return (
       <div className="max-w-6xl mx-auto">
         <div className="flex h-96">
-          <div className="w-1/3 bg-white rounded-xl shadow-sm border p-4">
+          <div className="w-1/3 glass-card p-4">
             <div className="animate-pulse space-y-4">
               {[...Array(5)].map((_, i) => (
                 <div key={i} className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                  <div className="w-10 h-10 bg-white/20 rounded-full"></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-4 bg-white/20 rounded w-3/4 mb-1"></div>
+                    <div className="h-3 bg-white/20 rounded w-1/2"></div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="flex-1 ml-6 bg-white rounded-xl shadow-sm border p-6">
+          <div className="flex-1 ml-6 glass-card p-6">
             <div className="animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+              <div className="h-6 bg-white/20 rounded w-1/3 mb-4"></div>
               <div className="space-y-3">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                <div className="h-4 bg-white/20 rounded"></div>
+                <div className="h-4 bg-white/20 rounded w-5/6"></div>
+                <div className="h-4 bg-white/20 rounded w-4/6"></div>
               </div>
             </div>
           </div>
@@ -146,15 +146,15 @@ export default function Chat() {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">💬 Messages</h1>
-        <p className="text-gray-600">Chat with other users in real-time</p>
+        <h1 className="text-3xl font-bold mb-2 text-white">💬 Messages</h1>
+        <p className="text-white/60">Chat with other users in real-time</p>
       </div>
 
-      <div className="flex h-[600px] bg-white rounded-xl shadow-sm border overflow-hidden">
+      <div className="flex h-[600px] glass-card overflow-hidden">
         {/* Chat List */}
-        <div className="w-1/3 border-r flex flex-col">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold">Conversations</h2>
+        <div className="w-1/3 border-r glass-divider flex flex-col">
+          <div className="p-4 border-b glass-divider">
+            <h2 className="text-lg font-semibold text-white">Conversations</h2>
             {unreadCount > 0 && (
               <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                 {unreadCount}
@@ -164,7 +164,7 @@ export default function Chat() {
           
           <div className="flex-1 overflow-y-auto">
             {chats.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-4 text-center text-white/60">
                 <div className="text-4xl mb-2">💬</div>
                 <p>No conversations yet</p>
                 <p className="text-sm">Start a conversation with someone!</p>
@@ -179,8 +179,8 @@ export default function Chat() {
                     <div
                       key={chat._id}
                       onClick={() => setSelectedChat(chat)}
-                      className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                        selectedChat?._id === chat._id ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                      className={`p-4 cursor-pointer transition-colors ${
+                        selectedChat?._id === chat._id ? 'bg-white/10 border-r-2 border-blue-500' : 'hover:bg-white/5'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -196,15 +196,15 @@ export default function Chat() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <h3 className="font-medium text-sm truncate">{otherUser?.name}</h3>
+                            <h3 className="font-medium text-sm truncate text-white">{otherUser?.name}</h3>
                             {chat.lastMessage && (
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-white/60">
                                 {formatTime(chat.lastMessage.timestamp)}
                               </span>
                             )}
                           </div>
                           <div className="flex items-center justify-between">
-                            <p className="text-sm text-gray-600 truncate">
+                            <p className="text-sm text-white/70 truncate">
                               {chat.lastMessage?.content || 'No messages yet'}
                             </p>
                             {unreadCount > 0 && (

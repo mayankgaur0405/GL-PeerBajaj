@@ -152,7 +152,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+    <div className="bg-white/10 border border-white/10 rounded-2xl shadow-sm transition transform hover:scale-[1.01] hover:shadow-xl p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center space-x-3">
         <img 
@@ -168,7 +168,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
       </div>
 
       {/* Post Title */}
-      <h2 className="text-xl font-bold">{post.title}</h2>
+      <h2 className="text-xl font-bold text-white">{post.title}</h2>
 
       {/* Post Content */}
       {renderPostContent()}
@@ -179,7 +179,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
           {post.tags.map((tag, index) => (
             <span 
               key={index}
-              className="bg-gray-100 text-gray-700 text-sm px-2 py-1 rounded"
+              className="bg-white/10 text-white text-sm px-2 py-1 rounded"
             >
               #{tag}
             </span>
@@ -189,7 +189,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
 
       {/* Actions */}
       {showActions && (
-        <div className="flex items-center justify-between pt-4 border-t">
+        <div className="flex items-center justify-between pt-4 border-t border-white/10">
           <div className="flex items-center space-x-6">
             <button
               onClick={handleLike}
