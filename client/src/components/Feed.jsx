@@ -89,8 +89,8 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
     return (
       <div className="space-y-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white/10 border border-white/10 rounded-2xl shadow-sm p-6 animate-pulse">
-            <div className="flex items-center space-x-3 mb-4">
+          <div key={i} className="glass-card p-6 animate-pulse">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-white/20 rounded-full"></div>
               <div className="flex-1">
                 <div className="h-4 bg-white/20 rounded w-1/3 mb-2"></div>
@@ -110,8 +110,8 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
 
   if (error) {
     return (
-      <div className="text-center py-8">
-        <p className="text-red-500 mb-4">{error}</p>
+      <div className="glass-card p-8 text-center">
+        <p className="text-red-400 mb-4">{error}</p>
         <button
           onClick={() => fetchPosts(1, true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -124,14 +124,12 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
 
   if (posts.length === 0) {
     return (
-      <div className="text-center py-8">
-        <div className="text-gray-400 mb-4">
-          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+      <div className="glass-card p-8 text-center">
+        <div className="text-white/70 mb-4">
+          <span className="inline-flex w-14 h-14 items-center justify-center rounded-full bg-white/10">📰</span>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No posts yet</h3>
-        <p className="text-gray-500">
+        <h3 className="text-lg font-semibold text-white mb-1">No posts yet</h3>
+        <p className="text-white/70 text-sm">
           {type === 'feed' 
             ? "Follow some users to see their posts in your feed"
             : "This user hasn't posted anything yet"
@@ -143,6 +141,10 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
 
   return (
     <div className="space-y-6">
+      <div className="section-header">
+        <span className="section-badge">📰</span>
+        <h3 className="text-white font-semibold">Your Feed</h3>
+      </div>
       {posts.map((post, idx) => (
         <div key={post._id} className="animate-[fadeInUp_.25s_ease-out]" style={{animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards'}}>
           <PostCard 
@@ -154,16 +156,19 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
 
       {loadingMore && (
         <div className="text-center py-4">
-          <div className="inline-flex items-center space-x-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="text-gray-600">Loading more posts...</span>
+          <div className="inline-flex items-center gap-2 text-white/80">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/20 border-t-blue-600"></div>
+            <span>Loading more posts...</span>
           </div>
         </div>
       )}
 
       {!hasMore && posts.length > 0 && (
-        <div className="text-center py-4">
-          <p className="text-gray-500">You've reached the end of the feed</p>
+        <div className="text-center py-6">
+          <div className="inline-flex items-center gap-2 text-white/70">
+            <span>🎉</span>
+            <p>You\'ve reached the end of the feed</p>
+          </div>
         </div>
       )}
     </div>

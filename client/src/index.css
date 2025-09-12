@@ -2,13 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global dark theme */
-:root {
-  color-scheme: dark;
-}
-html, body, #root {
-  @apply bg-slate-950 text-slate-100;
-}
+/* Global theme */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
+html, body, #root { @apply bg-gray-50 text-gray-900 transition-colors; }
+.dark html, .dark body, .dark #root { @apply bg-slate-950 text-slate-100; }
 
 /* Smooth transitions */
 .transition-base {
@@ -67,14 +65,18 @@ html, body, #root {
 .stagger > *:nth-child(5) { animation-delay: .20s; }
 .stagger > *:nth-child(6) { animation-delay: .24s; }
 
-/* Global dark forms */
+/* Theme-aware forms */
 @layer base {
   input, textarea, select {
-    @apply bg-slate-900 text-white placeholder-white/50 border border-white/10 rounded outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600;
+    @apply bg-white text-slate-900 placeholder-slate-400 border border-slate-300 rounded outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600;
   }
   button {
     @apply transition-base;
   }
+}
+
+.dark input, .dark textarea, .dark select {
+  @apply bg-slate-900 text-white placeholder-white/50 border-white/10;
 }
 
 /* Tabs helpers */
@@ -97,12 +99,6 @@ html, body, #root {
   @apply inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/10 text-white/70;
 }
 
-:root {
-  color-scheme: light;
-}
-
-body {
-  @apply bg-gray-50 text-gray-900;
-}
+/* end theme overrides */
 
 

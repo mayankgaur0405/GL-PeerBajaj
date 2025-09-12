@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useSocket } from '../context/SocketContext.jsx';
 import api from '../lib/api.js';
@@ -7,15 +8,27 @@ import ChatBox from '../components/ChatBox.jsx';
 export default function Chat() {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const [searchParams] = useSearchParams();
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     fetchChats();
     fetchUnreadCount();
   }, []);
+
+  // Auto-open chat when navigated with ?userId=
+  useEffect(() => {
+    const userId = searchParams.get('userId');
+    if (userId) {
+      startNewChat(userId);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (socket) {
@@ -52,7 +65,22 @@ export default function Chat() {
     try {
       setLoading(true);
       const response = await api.get('/chat');
-      setChats(response.data.chats || []);
+      const raw = response.data.chats || [];
+      // Dedupe by other user to avoid duplicate rows showing for same person
+      const byOther = new Map();
+      for (const chat of raw) {
+        const other = getOtherUserFrom(chat);
+        const key = other?._id || chat._id;
+        const existing = byOther.get(key);
+        if (!existing) {
+          byOther.set(key, chat);
+        } else {
+          const a = existing.lastMessage?.timestamp ? new Date(existing.lastMessage.timestamp).getTime() : 0;
+          const b = chat.lastMessage?.timestamp ? new Date(chat.lastMessage.timestamp).getTime() : 0;
+          if (b > a) byOther.set(key, chat);
+        }
+      }
+      setChats(Array.from(byOther.values()));
     } catch (err) {
       console.error('Failed to fetch chats:', err);
     } finally {
@@ -105,6 +133,28 @@ export default function Chat() {
     return chat.participants.find(p => p._id !== user?._id);
   };
 
+  const getOtherUserFrom = (chat) => {
+    return chat.participants?.find?.(p => p._id !== user?._id) || null;
+  };
+
+  // Search users to start chat
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (!q) { setSearchResults([]); return; }
+    const t = setTimeout(async () => {
+      try {
+        setSearching(true);
+        const res = await api.get(`/users/search`, { params: { username: q } });
+        setSearchResults(res.data.users || []);
+      } catch (e) {
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
   const getUnreadCountForChat = (chat) => {
     // This would need to be calculated based on unread messages
     // For now, return 0 as we don't have this data in the chat list
@@ -153,12 +203,40 @@ export default function Chat() {
       <div className="flex h-[600px] glass-card overflow-hidden">
         {/* Chat List */}
         <div className="w-1/3 border-r glass-divider flex flex-col">
-          <div className="p-4 border-b glass-divider">
-            <h2 className="text-lg font-semibold text-white">Conversations</h2>
-            {unreadCount > 0 && (
-              <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                {unreadCount}
-              </span>
+          <div className="p-4 border-b glass-divider space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Conversations</h2>
+              {unreadCount > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search users..."
+              className="w-full rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-600"
+            />
+            {searchQuery && (
+              <div className="max-h-56 overflow-y-auto rounded-lg border border-white/10 bg-slate-900">
+                {searching ? (
+                  <div className="p-3 text-center text-white/60">Searching...</div>
+                ) : searchResults.length ? (
+                  searchResults.map((u) => (
+                    <div key={u._id} onClick={() => { startNewChat(u._id); setSearchQuery(''); setSearchResults([]); }} className="flex items-center gap-3 p-3 hover:bg-white/5 cursor-pointer">
+                      <img src={u.profilePicture || '/default-avatar.png'} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
+                      <div className="min-w-0">
+                        <div className="text-white text-sm truncate">{u.name}</div>
+                        <div className="text-white/60 text-xs truncate">@{u.username}</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-3 text-center text-white/60">No users found</div>
+                )}
+              </div>
             )}
           </div>
           

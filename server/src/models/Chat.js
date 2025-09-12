@@ -26,6 +26,8 @@ const ChatSchema = new mongoose.Schema(
       ref: 'User', 
       required: true 
     }],
+    // Deterministic key for a 1:1 chat pair to enforce uniqueness irrespective of order
+    pairKey: { type: String, unique: true, index: true },
     messages: [MessageSchema],
     lastMessage: {
       content: { type: String },
@@ -48,6 +50,9 @@ ChatSchema.pre('save', function(next) {
   if (this.participants.length !== 2) {
     return next(new Error('Chat must have exactly 2 participants'));
   }
+  // compute deterministic pairKey: smallerId_biggerId
+  const [a, b] = this.participants.map(id => id.toString()).sort();
+  this.pairKey = `${a}_${b}`;
   next();
 });
 
@@ -84,19 +89,23 @@ ChatSchema.methods.markAsRead = function(userId) {
 
 // Static method to find or create chat between two users
 ChatSchema.statics.findOrCreateChat = async function(user1Id, user2Id) {
-  let chat = await this.findOne({
-    participants: { $all: [user1Id, user2Id] }
-  }).populate('participants', 'name username profilePicture');
-  
-  if (!chat) {
-    chat = new this({
-      participants: [user1Id, user2Id],
-      messages: []
-    });
-    await chat.save();
-    await chat.populate('participants', 'name username profilePicture');
-  }
-  
+  const [a, b] = [user1Id.toString(), user2Id.toString()].sort();
+  const pairKey = `${a}_${b}`;
+
+  // Use upsert guard to avoid race condition duplicate chats
+  const chat = await this.findOneAndUpdate(
+    { pairKey },
+    {
+      $setOnInsert: {
+        participants: [a, b],
+        pairKey,
+        messages: []
+      }
+    },
+    { new: true, upsert: true }
+  ).populate('participants', 'name username profilePicture')
+   .populate('lastMessage.sender', 'name username');
+
   return chat;
 };
 

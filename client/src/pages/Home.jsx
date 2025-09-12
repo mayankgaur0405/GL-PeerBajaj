@@ -12,7 +12,7 @@ import TrendingResourceCard from '../components/TrendingResourceCard.jsx'
 import { topContributors as fallbackContributors, trendingResources } from '../data/homeShowcase.js'
 import Feed from '../components/Feed.jsx'
 import StudyMaterials from '../components/StudyMaterials.jsx'
-import Extras, { PlacementPrepSection, AboutSection, BenefitsSection, CareerSection, InternshipSection, PlatformFeaturesSection, ReviewsSection, FooterSection } from '../components/Extras.jsx'
+import Extras, { PlacementPrepSection, AboutSection, BenefitsSection, CareerSection, InternshipSection, PlatformFeaturesSection, ReviewsSection, FooterSection, HeroSection } from '../components/Extras.jsx'
 
 export default function Home() {
   const { user } = useAuth()
@@ -72,42 +72,10 @@ export default function Home() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white p-8 mb-8">
-        <h1 className="text-4xl font-bold mb-4">Welcome to GL PeerBajaj</h1>
-        <p className="text-xl mb-6">Connect, learn, and grow with your peers in the tech community</p>
-        {user ? (
-          <div className="flex space-x-4">
-            <Link 
-              to="/feed" 
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Go to Feed
-            </Link>
-            <Link 
-              to="/trending" 
-              className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-            >
-              Explore Trending
-            </Link>
-          </div>
-        ) : (
-          <div className="flex space-x-4">
-            <Link 
-              to="/signup" 
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Get Started
-            </Link>
-            <Link 
-              to="/login" 
-              className="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-            >
-              Login
-            </Link>
-          </div>
-        )}
+    <div className="snap-y snap-mandatory">
+      {/* Fullscreen Hero */}
+      <div className="snap-start">
+        <HeroSection />
       </div>
 
       {/* Tabs */}
@@ -132,7 +100,8 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="max-w-6xl mx-auto px-4 py-8 snap-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {activeTab === 'discover' ? (
@@ -255,9 +224,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </div>
       </div>
       {/* Study Materials & Ordered Sections */}
-      <div className="mt-10 space-y-10">
+      <div className="mt-10 space-y-10 snap-start">
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-1">
           <div className="rounded-2xl p-6 bg-slate-900 space-y-8">
             {/* Semester Prep */}
@@ -268,13 +238,13 @@ export default function Home() {
         </div>
 
         {/* Independent sections below */}
-        <AboutSection />
-        <BenefitsSection />
-        <InternshipSection />
-        <PlatformFeaturesSection />
-        <ReviewsSection />
-        <CareerSection />
-        <FooterSection />
+        <div className="snap-start"><AboutSection /></div>
+        <div className="snap-start"><BenefitsSection /></div>
+        <div className="snap-start"><InternshipSection /></div>
+        <div className="snap-start"><PlatformFeaturesSection /></div>
+        <div className="snap-start"><ReviewsSection /></div>
+        <div className="snap-start"><CareerSection /></div>
+        <div className="snap-start"><FooterSection /></div>
       </div>
     </div>
   )

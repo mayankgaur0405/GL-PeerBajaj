@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import api from '../lib/api.js';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserSuggestions() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [following, setFollowing] = useState(new Set());
@@ -75,9 +77,9 @@ export default function UserSuggestions() {
 
   if (suggestions.length === 0) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border p-6">
-        <h3 className="text-lg font-semibold mb-4">Suggested for you</h3>
-        <p className="text-gray-500 text-center py-4">No suggestions available</p>
+      <div className="glass-card p-6">
+        <h3 className="text-white text-lg font-semibold mb-4">Suggested for you</h3>
+        <p className="text-white/60 text-center py-4">No suggestions available</p>
       </div>
     );
   }
@@ -95,7 +97,11 @@ export default function UserSuggestions() {
           const isCurrentUser = suggestion._id === user?._id;
           
           return (
-            <div key={suggestion._id} className="flex items-center space-x-3 transition transform hover:scale-[1.01]">
+            <div
+              key={suggestion._id}
+              className="flex items-center space-x-3 transition transform hover:scale-[1.01] cursor-pointer"
+              onClick={() => navigate(`/profile/${suggestion._id}`)}
+            >
               <img
                 src={suggestion.profilePicture || '/default-avatar.png'}
                 alt={suggestion.name}
@@ -110,7 +116,7 @@ export default function UserSuggestions() {
               </div>
               {!isCurrentUser && (
                 <button
-                  onClick={() => isFollowing ? handleUnfollow(suggestion._id) : handleFollow(suggestion._id)}
+                  onClick={(e) => { e.stopPropagation(); isFollowing ? handleUnfollow(suggestion._id) : handleFollow(suggestion._id); }}
                   className={`px-3 py-1 text-xs rounded-full font-medium transition-colors btn-glow ${
                     isFollowing
                       ? 'bg-white/20 text-white hover:bg-white/30'

@@ -19,16 +19,28 @@ export default function StudyMaterials() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white">Resources by GL PeerBajaj</h2>
+      <div className="section-header">
+        <span className="section-badge">🏫</span>
+        <h2 className="text-2xl font-bold text-white">AcedmicsPreparation</h2>
+      </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {studyPlan.map((y) => (
           <div key={y.year} className="space-y-3">
-            <div className="bg-white/10 border border-white/10 rounded-2xl p-4 shadow hover:shadow-lg transition hover:translate-y-[-2px]">
-              <div className="text-white font-semibold mb-2">Year {y.year}</div>
+            <div className="glass-card p-4 text-white hover-glow hover-raise">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-blue-500/30">🎓</span>
+                  <div className="font-semibold">Year {y.year}</div>
+                </div>
+                <div className="text-xs text-white/70">{y.semesters.length} semesters</div>
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 {y.semesters.map((s) => (
-                  <div key={s.sem} className="bg-white/20 rounded-xl p-3 text-white">
-                    <div className="font-medium">Semester {s.sem}</div>
+                  <div key={s.sem} className="bg-white/10 rounded-xl p-3 text-white border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">Sem {s.sem}</div>
+                      <div className="text-[10px] text-white/70">{s.subjects.length} subjects</div>
+                    </div>
                     <button
                       className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg px-3 py-1"
                       onClick={() => openSem(y.year, s)}
@@ -64,9 +76,12 @@ export default function StudyMaterials() {
               const key = `${active.year}-${active.sem}-${sub.name}`
               const fav = favorites[key]
               return (
-                <div key={sub.name} className="rounded-xl border border-white/20 p-3">
+                <div key={sub.name} className="rounded-xl border border-white/20 p-3 bg-white/5">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="font-medium text-white/90">{sub.name}</div>
+                    <div className="font-medium text-white/90 flex items-center gap-2">
+                      <span className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-emerald-500/30">📘</span>
+                      {sub.name}
+                    </div>
                     <button
                       onClick={() => toggleFav(key)}
                       className={`px-2 py-1 rounded text-sm ${

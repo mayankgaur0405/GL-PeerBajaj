@@ -152,23 +152,26 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
   };
 
   return (
-    <div className="bg-white/10 border border-white/10 rounded-2xl shadow-sm transition transform hover:scale-[1.01] hover:shadow-xl p-6 space-y-4">
+    <div className="glass-card p-6 space-y-4 hover-glow hover-raise">
       {/* Header */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center gap-3">
         <img 
           src={post.author?.profilePicture || '/default-avatar.png'} 
           alt={post.author?.name}
           className="w-10 h-10 rounded-full object-cover"
         />
-        <div className="flex-1">
-          <h3 className="font-semibold">{post.author?.name}</h3>
-          <p className="text-sm text-gray-500">@{post.author?.username}</p>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold truncate">{post.author?.name}</h3>
+            {post.author?.isVerified && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600/20 text-blue-300">Verified</span>}
+          </div>
+          <p className="text-xs text-white/60 truncate">@{post.author?.username}</p>
         </div>
-        <span className="text-sm text-gray-500">{formatDate(post.createdAt)}</span>
+        <span className="text-xs text-white/60">{formatDate(post.createdAt)}</span>
       </div>
 
       {/* Post Title */}
-      <h2 className="text-xl font-bold text-white">{post.title}</h2>
+      {post.title && <h2 className="text-xl font-semibold text-white">{post.title}</h2>}
 
       {/* Post Content */}
       {renderPostContent()}
@@ -179,7 +182,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
           {post.tags.map((tag, index) => (
             <span 
               key={index}
-              className="bg-white/10 text-white text-sm px-2 py-1 rounded"
+              className="text-xs px-2 py-1 rounded-full border border-white/15 text-white/80"
             >
               #{tag}
             </span>
@@ -190,12 +193,12 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
       {/* Actions */}
       {showActions && (
         <div className="flex items-center justify-between pt-4 border-t border-white/10">
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center gap-6">
             <button
               onClick={handleLike}
               disabled={isLoading}
-              className={`flex items-center space-x-2 ${
-                isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+              className={`inline-flex items-center gap-2 ${
+                isLiked ? 'text-red-400' : 'text-white/60 hover:text-red-400'
               } transition-colors`}
             >
               <svg className="w-5 h-5" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +209,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
 
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-blue-400 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -217,7 +220,7 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
             <button
               onClick={handleShare}
               disabled={isLoading}
-              className="flex items-center space-x-2 text-gray-500 hover:text-green-500 transition-colors"
+              className="inline-flex items-center gap-2 text-white/60 hover:text-green-400 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
@@ -230,16 +233,16 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
 
       {/* Comments Section */}
       {showComments && (
-        <div className="border-t pt-4 space-y-4">
+        <div className="border-t border-white/10 pt-4 space-y-4">
           {/* Add Comment */}
           {user && (
-            <form onSubmit={handleComment} className="flex space-x-2">
+            <form onSubmit={handleComment} className="flex gap-2">
               <input
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Write a comment..."
-                className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-lg px-3 py-2 bg-white/5 border border-white/10 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-600"
                 disabled={isLoading}
               />
               <button
@@ -256,18 +259,18 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
           {post.comments && post.comments.length > 0 && (
             <div className="space-y-3">
               {post.comments.map((comment) => (
-                <div key={comment._id} className="flex space-x-3">
+                <div key={comment._id} className="flex gap-3">
                   <img 
                     src={comment.author?.profilePicture || '/default-avatar.png'} 
                     alt={comment.author?.name}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div className="flex-1">
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <h4 className="font-medium text-sm">{comment.author?.name}</h4>
-                      <p className="text-sm mt-1">{comment.content}</p>
+                    <div className="rounded-lg p-3 bg-white/5 border border-white/10">
+                      <h4 className="font-medium text-sm text-white/90">{comment.author?.name}</h4>
+                      <p className="text-sm mt-1 text-white/80">{comment.content}</p>
                     </div>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-white/50">
                       {formatDate(comment.createdAt)}
                     </span>
                   </div>

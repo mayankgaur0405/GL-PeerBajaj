@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import api from '../lib/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import Feed from '../components/Feed.jsx'
 
 export default function Profile() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
@@ -66,21 +67,29 @@ export default function Profile() {
             )}
           </div>
           {user && user._id !== profile._id && (
-            amFollowing ? (
+            <div className="flex gap-2">
+              {amFollowing ? (
+                <button
+                  onClick={unfollow}
+                  className="px-4 py-2 rounded bg-white/10 text-white hover:bg-white/20"
+                >
+                  Unfollow
+                </button>
+              ) : (
+                <button
+                  onClick={follow}
+                  className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                >
+                  Follow
+                </button>
+              )}
               <button
-                onClick={unfollow}
-                className="px-4 py-2 rounded bg-gray-200"
+                onClick={() => navigate(`/chat?userId=${profile._id}`)}
+                className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
               >
-                Unfollow
+                Chat
               </button>
-            ) : (
-              <button
-                onClick={follow}
-                className="px-4 py-2 rounded bg-blue-600 text-white"
-              >
-                Follow
-              </button>
-            )
+            </div>
           )}
         </div>
       </div>

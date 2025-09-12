@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSocket } from '../context/SocketContext.jsx'
 import api from '../lib/api.js'
+import { useTheme } from '../context/ThemeContext.jsx'
 import Notifications from './Notifications.jsx'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const { socket } = useSocket()
+  const { theme, toggleTheme } = useTheme()
   const [showNotifications, setShowNotifications] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [unreadChatCount, setUnreadChatCount] = useState(0)
@@ -136,6 +138,13 @@ export default function Navbar() {
               </NavLink>
 
               <div className="flex items-center space-x-2">
+                <button
+                  onClick={toggleTheme}
+                  className="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-white text-sm transition-base"
+                  title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+                >
+                  {theme === 'dark' ? '☀️' : '🌙'}
+                </button>
                 <Link to={`/profile/${user._id}`} className="flex items-center space-x-2">
                   <img 
                     src={user.profilePicture || '/default-avatar.png'} 
