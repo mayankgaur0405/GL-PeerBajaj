@@ -32,11 +32,36 @@ const UserSchema = new mongoose.Schema(
     department: { type: String, default: '' },
     specialization: { type: String, default: '' },
     bio: { type: String, default: '' },
+    profilePicture: { type: String, default: '' },
+    coverPicture: { type: String, default: '' },
     sections: { type: [SectionSchema], default: [] },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    
+    // Social features
+    isOnline: { type: Boolean, default: false },
+    lastSeen: { type: Date, default: Date.now },
+    
+    // Privacy settings
+    isPrivate: { type: Boolean, default: false },
+    allowMessages: { type: Boolean, default: true },
+    
+    // Engagement metrics
+    totalPosts: { type: Number, default: 0 },
+    totalLikes: { type: Number, default: 0 },
+    
+    // Trending score for profiles
+    trendingScore: { type: Number, default: 0, index: true }
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    indexes: [
+      { username: 1 },
+      { email: 1 },
+      { followers: 1 },
+      { trendingScore: -1 }
+    ]
+  }
 );
 
 // Hash password before saving
@@ -51,6 +76,48 @@ UserSchema.pre('save', async function (next) {
 UserSchema.methods.comparePassword = async function (candidate) {
   return bcrypt.compare(candidate, this.password);
 };
+
+// Method to calculate trending score
+UserSchema.methods.calculateTrendingScore = function() {
+  const followerWeight = this.followers.length * 2;
+  const postWeight = this.totalPosts * 1;
+  const likeWeight = this.totalLikes * 0.5;
+  
+  this.trendingScore = followerWeight + postWeight + likeWeight;
+  return this.trendingScore;
+};
+
+// Static method to get trending users
+UserSchema.statics.getTrendingUsers = function(limit = 20) {
+  return this.find({ isPrivate: false })
+    .sort({ trendingScore: -1, followers: -1 })
+    .limit(limit)
+    .select('name username profilePicture followers following totalPosts totalLikes bio year department');
+};
+
+// Static method to search users with better indexing
+UserSchema.statics.searchUsers = function(query, limit = 20) {
+  const searchRegex = new RegExp(query, 'i');
+  return this.find({
+    $or: [
+      { username: searchRegex },
+      { name: searchRegex },
+      { bio: searchRegex }
+    ],
+    isPrivate: false
+  })
+  .sort({ followers: -1, trendingScore: -1 })
+  .limit(limit)
+  .select('name username profilePicture followers following bio year department');
+};
+
+// Update trending score before saving
+UserSchema.pre('save', function(next) {
+  if (this.isModified('followers') || this.isModified('totalPosts') || this.isModified('totalLikes')) {
+    this.calculateTrendingScore();
+  }
+  next();
+});
 
 // Export User model
 export const User = mongoose.model('User', UserSchema);
