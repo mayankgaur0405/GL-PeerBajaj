@@ -18,7 +18,16 @@ export function SocketProvider({ children }) {
         ?.split('=')[1];
 
       if (token) {
-        const newSocket = io(import.meta.env.VITE_API_BASE?.replace('/api', '') || 'http://localhost:5000', {
+        // Determine socket URL based on environment
+        const getSocketUrl = () => {
+          if (import.meta.env.PROD) {
+            return import.meta.env.VITE_API_BASE?.replace('/api', '') || 'https://gl-peerbridge.onrender.com';
+          }
+          // Development mode - use localhost
+          return 'http://localhost:5000';
+        };
+
+        const newSocket = io(getSocketUrl(), {
           auth: {
             token: token
           },

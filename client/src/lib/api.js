@@ -6,8 +6,8 @@ const getApiBaseUrl = () => {
   if (import.meta.env.PROD) {
     return import.meta.env.VITE_API_BASE || 'https://gl-peerbridge.onrender.com/api'
   }
-  // Development mode
-  return import.meta.env.VITE_API_BASE || 'http://localhost:5000/api'
+  // Development mode - use relative path for proxy
+  return import.meta.env.VITE_API_BASE || '/api'
 }
 
 const api = axios.create({
