@@ -103,7 +103,7 @@ export default function UserSuggestions() {
               onClick={() => navigate(`/profile/${suggestion._id}`)}
             >
               <img
-                src={suggestion.profilePicture || '/default-avatar.png'}
+                src={suggestion.profilePicture || '/default-avatar.svg'}
                 alt={suggestion.name}
                 className="w-10 h-10 rounded-full object-cover"
               />

@@ -205,7 +205,7 @@ export default function ChatBox({ chatId, onClose }) {
       <div className="flex items-center justify-between p-4 border-b glass-divider">
         <div className="flex items-center space-x-3">
           <img 
-            src={otherUser?.profilePicture || '/default-avatar.png'} 
+            src={otherUser?.profilePicture || '/default-avatar.svg'} 
             alt={otherUser?.name}
             className="w-8 h-8 rounded-full object-cover"
           />

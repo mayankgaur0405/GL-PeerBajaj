@@ -124,7 +124,7 @@ export default function Trending() {
             <div key={profile._id} className="glass-card p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <img
-                  src={profile.profilePicture || '/default-avatar.png'}
+                  src={profile.profilePicture || '/default-avatar.svg'}
                   alt={profile.name}
                   className="w-12 h-12 rounded-full object-cover"
                 />
@@ -251,7 +251,7 @@ export default function Trending() {
           <div key={post._id} className="glass-card p-6">
             <div className="flex items-center space-x-3 mb-4">
               <img
-                src={post.author?.profilePicture || '/default-avatar.png'}
+                src={post.author?.profilePicture || '/default-avatar.svg'}
                 alt={post.author?.name}
                 className="w-10 h-10 rounded-full object-cover"
               />

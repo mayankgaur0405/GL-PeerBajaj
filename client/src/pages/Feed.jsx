@@ -95,10 +95,10 @@ export default function FeedPage() {
                 🔥 Trending
               </a>
               <a
-                href="/dashboard"
+                href={`/profile/${user._id}`}
                 className="block w-full text-left px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
               >
-                ⚙️ Dashboard
+                ⚙️ Profile
               </a>
               <a
                 href="/chat"

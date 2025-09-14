@@ -34,9 +34,20 @@ export async function login(req, res, next) {
     if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
     const accessToken = signAccessToken({ id: user._id });
     const refreshToken = signRefreshToken({ id: user._id });
+    const isProduction = process.env.NODE_ENV === 'production';
     res
-      .cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'lax' })
-      .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'lax' })
+      .cookie('accessToken', accessToken, { 
+        httpOnly: true, 
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction,
+        maxAge: 15 * 60 * 1000 // 15 minutes
+      })
+      .cookie('refreshToken', refreshToken, { 
+        httpOnly: true, 
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction,
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      })
       .json({ user: sanitize(user), accessToken });
   } catch (err) {
     next(err);
@@ -53,7 +64,13 @@ export async function refresh(req, res, next) {
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
     const decoded = verifyRefreshToken(token);
     const accessToken = signAccessToken({ id: decoded.id });
-    res.cookie('accessToken', accessToken, { httpOnly: true, sameSite: 'lax' }).json({ accessToken });
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('accessToken', accessToken, { 
+      httpOnly: true, 
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    }).json({ accessToken });
   } catch (err) {
     next(err);
   }

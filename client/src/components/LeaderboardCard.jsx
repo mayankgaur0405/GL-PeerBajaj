@@ -14,7 +14,7 @@ export default function LeaderboardCard({ user, index }) {
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <img 
-            src={user.avatar || '/default-avatar.png'} 
+            src={user.avatar || '/default-avatar.svg'} 
             alt={user.name} 
             className="w-12 h-12 rounded-full object-cover flex-shrink-0" 
           />

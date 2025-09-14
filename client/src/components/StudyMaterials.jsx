@@ -21,7 +21,7 @@ export default function StudyMaterials() {
     <div className="space-y-6">
       <div className="section-header">
         <span className="section-badge">🏫</span>
-        <h2 className="text-2xl font-bold text-white">AcedmicsPreparation</h2>
+        <h2 className="text-2xl font-bold text-white">Preparation Resources By GL PeerBajaj</h2>
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {studyPlan.map((y) => (

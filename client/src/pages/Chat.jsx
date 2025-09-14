@@ -226,7 +226,7 @@ export default function Chat() {
                 ) : searchResults.length ? (
                   searchResults.map((u) => (
                     <div key={u._id} onClick={() => { startNewChat(u._id); setSearchQuery(''); setSearchResults([]); }} className="flex items-center gap-3 p-3 hover:bg-white/5 cursor-pointer">
-                      <img src={u.profilePicture || '/default-avatar.png'} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
+                      <img src={u.profilePicture || '/default-avatar.svg'} alt={u.name} className="w-8 h-8 rounded-full object-cover" />
                       <div className="min-w-0">
                         <div className="text-white text-sm truncate">{u.name}</div>
                         <div className="text-white/60 text-xs truncate">@{u.username}</div>
@@ -264,7 +264,7 @@ export default function Chat() {
                       <div className="flex items-center space-x-3">
                         <div className="relative">
                           <img
-                            src={otherUser?.profilePicture || '/default-avatar.png'}
+                            src={otherUser?.profilePicture || '/default-avatar.svg'}
                             alt={otherUser?.name}
                             className="w-10 h-10 rounded-full object-cover"
                           />
@@ -406,7 +406,7 @@ function StartNewChatModal({ isOpen, onClose, onStartChat }) {
                     className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
                   >
                     <img
-                      src={user.profilePicture || '/default-avatar.png'}
+                      src={user.profilePicture || '/default-avatar.svg'}
                       alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
                     />

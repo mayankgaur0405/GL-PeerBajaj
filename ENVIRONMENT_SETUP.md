@@ -31,18 +31,18 @@ Create a `.env` file in the `server/` directory:
 #### Development (.env)
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/gl-peerbajaj
+MONGODB_URI=mongodb+srv://mayankgaur1504:GLConnectfzkkd45@cluster0.upmsgu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 CLIENT_ORIGIN=http://localhost:5173
-JWT_SECRET=your_jwt_secret_key_here
+JWT_SECRET=mayank_gaur_GL PeerBajaj_jwt_secret_key
 NODE_ENV=development
 ```
 
 #### Production (.env.production)
 ```env
 PORT=5000
-MONGODB_URI=your_mongodb_atlas_connection_string_here
+MONGODB_URI=mongodb+srv://mayankgaur1504:GLConnectfzkkd45@cluster0.upmsgu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 CLIENT_ORIGIN=https://gl-peer-bajaj.vercel.app
-JWT_SECRET=your_production_jwt_secret_key_here
+JWT_SECRET=mayank_gaur_GL PeerBajaj_jwt_secret_key
 NODE_ENV=production
 ```
 

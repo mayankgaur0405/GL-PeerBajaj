@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import api from '../lib/api.js';
 
-export default function CreatePost({ onPostCreated }) {
+export default function EditPost({ post, onUpdate, onCancel }) {
   const { user } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const [postType, setPostType] = useState('text');
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -26,6 +24,23 @@ export default function CreatePost({ onPostCreated }) {
     'Data Science', 'Cybersecurity', 'Other'
   ];
 
+  useEffect(() => {
+    if (post) {
+      setFormData({
+        title: post.title || '',
+        content: post.content || '',
+        section: {
+          title: post.section?.title || '',
+          description: post.section?.description || '',
+          category: post.section?.category || '',
+          resources: post.section?.resources || []
+        },
+        images: post.images || [],
+        tags: post.tags || []
+      });
+    }
+  }, [post]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.title.trim()) return;
@@ -33,43 +48,27 @@ export default function CreatePost({ onPostCreated }) {
     setLoading(true);
     try {
       const postData = {
-        type: postType,
         title: formData.title,
         content: formData.content,
         tags: formData.tags.filter(tag => tag.trim())
       };
 
-      if (postType === 'section') {
+      if (post.type === 'section') {
         postData.section = formData.section;
       }
 
-      if (postType === 'image' && formData.images.length > 0) {
+      if (post.type === 'image' && formData.images.length > 0) {
         postData.images = formData.images;
       }
 
-      await api.post('/posts', postData);
+      await api.put(`/posts/${post._id}`, postData);
       
-      // Reset form
-      setFormData({
-        title: '',
-        content: '',
-        section: {
-          title: '',
-          description: '',
-          category: '',
-          resources: []
-        },
-        images: [],
-        tags: []
-      });
-      setIsOpen(false);
-      
-      if (onPostCreated) {
-        onPostCreated();
+      if (onUpdate) {
+        onUpdate();
       }
     } catch (err) {
-      console.error('Failed to create post:', err);
-      alert('Failed to create post');
+      console.error('Failed to update post:', err);
+      alert('Failed to update post');
     } finally {
       setLoading(false);
     }
@@ -164,32 +163,14 @@ export default function CreatePost({ onPostCreated }) {
     }));
   };
 
-  if (!isOpen) {
-    return (
-      <div className="glass-card p-6">
-        <div className="flex items-center space-x-3">
-          <img 
-            src={user?.profilePicture || '/default-avatar.svg'} 
-            alt={user?.name}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <button
-            onClick={() => setIsOpen(true)}
-            className="flex-1 text-left bg-white/10 rounded-full px-4 py-2 text-white/60 hover:bg-white/20 transition-colors"
-          >
-            What's on your mind?
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (!post) return null;
 
   return (
     <div className="glass-card p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Create Post</h2>
+        <h2 className="text-lg font-semibold text-white">Edit Post</h2>
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={onCancel}
           className="text-white/60 hover:text-white"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,26 +180,13 @@ export default function CreatePost({ onPostCreated }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Post Type Selection */}
+        {/* Post Type Display */}
         <div>
           <label className="block text-sm font-medium text-white/80 mb-2">Post Type</label>
-          <div className="flex space-x-4">
-            {[
-              { value: 'text', label: 'Text/Blog' },
-              { value: 'section', label: 'Section/Roadmap' },
-              { value: 'image', label: 'Image' }
-            ].map(type => (
-              <label key={type.value} className="flex items-center">
-                <input
-                  type="radio"
-                  value={type.value}
-                  checked={postType === type.value}
-                  onChange={(e) => setPostType(e.target.value)}
-                  className="mr-2"
-                />
-                {type.label}
-              </label>
-            ))}
+          <div className="text-white/60">
+            {post.type === 'text' && 'Text/Blog'}
+            {post.type === 'section' && 'Section/Roadmap'}
+            {post.type === 'image' && 'Image'}
           </div>
         </div>
 
@@ -229,7 +197,7 @@ export default function CreatePost({ onPostCreated }) {
             type="text"
             value={formData.title}
             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-            className="w-full rounded-lg px-3 py-2"
+            className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter post title..."
             required
           />
@@ -241,15 +209,15 @@ export default function CreatePost({ onPostCreated }) {
           <textarea
             value={formData.content}
             onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            className="w-full rounded-lg px-3 py-2"
+            className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={4}
             placeholder="Write your post content..."
           />
         </div>
 
         {/* Section-specific fields */}
-        {postType === 'section' && (
-          <div className="space-y-4 border-t pt-4">
+        {post.type === 'section' && (
+          <div className="space-y-4 border-t border-white/10 pt-4">
             <div>
               <label className="block text-sm font-medium text-white/80 mb-2">Section Title</label>
               <input
@@ -259,7 +227,7 @@ export default function CreatePost({ onPostCreated }) {
                   ...prev,
                   section: { ...prev.section, title: e.target.value }
                 }))}
-                className="w-full rounded-lg px-3 py-2"
+                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., React Fundamentals"
               />
             </div>
@@ -272,7 +240,7 @@ export default function CreatePost({ onPostCreated }) {
                   ...prev,
                   section: { ...prev.section, category: e.target.value }
                 }))}
-                className="w-full rounded-lg px-3 py-2"
+                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select category</option>
                 {categories.map(category => (
@@ -289,7 +257,7 @@ export default function CreatePost({ onPostCreated }) {
                   ...prev,
                   section: { ...prev.section, description: e.target.value }
                 }))}
-                className="w-full rounded-lg px-3 py-2"
+                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
                 placeholder="Describe this section/roadmap..."
               />
@@ -310,7 +278,7 @@ export default function CreatePost({ onPostCreated }) {
               {formData.section.resources.map((resource, index) => (
                 <div key={index} className="glass-card p-3 mb-2 space-y-2">
                   <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Resource {index + 1}</h4>
+                    <h4 className="font-medium text-white">Resource {index + 1}</h4>
                     <button
                       type="button"
                       onClick={() => removeResource(index)}
@@ -323,21 +291,21 @@ export default function CreatePost({ onPostCreated }) {
                     type="text"
                     value={resource.title}
                     onChange={(e) => updateResource(index, 'title', e.target.value)}
-                    className="w-full rounded px-2 py-1 text-sm"
+                    className="w-full rounded px-2 py-1 text-sm bg-white/10 border border-white/20 text-white placeholder-white/40"
                     placeholder="Resource title"
                   />
                   <input
                     type="url"
                     value={resource.link}
                     onChange={(e) => updateResource(index, 'link', e.target.value)}
-                    className="w-full rounded px-2 py-1 text-sm"
+                    className="w-full rounded px-2 py-1 text-sm bg-white/10 border border-white/20 text-white placeholder-white/40"
                     placeholder="Resource URL"
                   />
                   <input
                     type="text"
                     value={resource.description}
                     onChange={(e) => updateResource(index, 'description', e.target.value)}
-                    className="w-full rounded px-2 py-1 text-sm"
+                    className="w-full rounded px-2 py-1 text-sm bg-white/10 border border-white/20 text-white placeholder-white/40"
                     placeholder="Description (optional)"
                   />
                 </div>
@@ -346,40 +314,43 @@ export default function CreatePost({ onPostCreated }) {
           </div>
         )}
 
-        {/* Image upload */}
-        {postType === 'image' && (
-          <div className="space-y-4 border-t pt-4">
+        {/* Image management */}
+        {post.type === 'image' && (
+          <div className="space-y-4 border-t border-white/10 pt-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">Images</label>
+              <label className="block text-sm font-medium text-white/80 mb-2">Add More Images</label>
               <input
                 type="file"
                 multiple
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="w-full rounded-lg px-3 py-2"
+                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white"
                 disabled={uploading}
               />
               {uploading && <p className="text-sm text-white/60 mt-1">Uploading...</p>}
             </div>
 
             {formData.images.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                {formData.images.map((image, index) => (
-                  <div key={index} className="relative">
-                    <img
-                      src={image.url}
-                      alt={`Upload ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">Current Images</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {formData.images.map((image, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={image.url}
+                        alt={`Upload ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -391,7 +362,7 @@ export default function CreatePost({ onPostCreated }) {
           <input
             type="text"
             onKeyPress={addTag}
-            className="w-full rounded-lg px-3 py-2"
+            className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Press Enter to add tags"
           />
           {formData.tags.length > 0 && (
@@ -415,11 +386,11 @@ export default function CreatePost({ onPostCreated }) {
           )}
         </div>
 
-        {/* Submit Button */}
+        {/* Submit Buttons */}
         <div className="flex justify-end space-x-3">
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={onCancel}
             className="px-4 py-2 border border-white/10 rounded-lg hover:bg-white/10 text-white"
           >
             Cancel
@@ -427,9 +398,9 @@ export default function CreatePost({ onPostCreated }) {
           <button
             type="submit"
             disabled={loading || !formData.title.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 btn-glow"
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
-            {loading ? 'Posting...' : 'Post'}
+            {loading ? 'Updating...' : 'Update Post'}
           </button>
         </div>
       </form>

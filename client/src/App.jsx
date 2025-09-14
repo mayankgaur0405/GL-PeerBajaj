@@ -4,7 +4,6 @@ import Home from './pages/Home.jsx';
 import Profile from './pages/Profile.jsx';
 import Login from './pages/Login.jsx';
 import Signup from './pages/Signup.jsx';
-import Dashboard from './pages/Dashboard.jsx';
 import Feed from './pages/Feed.jsx';
 import Trending from './pages/Trending.jsx';
 import Chat from './pages/Chat.jsx';
@@ -34,14 +33,6 @@ export default function App() {
               <Route path="/profile/:id" element={<Profile />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <PrivateRoute>
-                    <Dashboard />
-                  </PrivateRoute>
-                }
-              />
               <Route
                 path="/feed"
                 element={
