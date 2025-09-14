@@ -1,0 +1,21 @@
+{
+  "name": "gl-peerbajaj-db-clearer",
+  "version": "1.0.0",
+  "description": "Script to clear all collections in GL PeerBajaj MongoDB database",
+  "main": "clearDb.js",
+  "scripts": {
+    "clear-db": "node clearDb.js",
+    "start": "node clearDb.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.19.0"
+  },
+  "keywords": [
+    "mongodb",
+    "database",
+    "clear",
+    "gl-peerbajaj"
+  ],
+  "author": "Mayank Gaur",
+  "license": "MIT"
+}

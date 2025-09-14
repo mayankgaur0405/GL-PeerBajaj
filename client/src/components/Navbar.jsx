@@ -35,11 +35,11 @@ export default function Navbar() {
   return (
     <header className="backdrop-blur bg-slate-900/70 border-b border-white/10 sticky top-0 z-40">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="flex items-center">
+        <Link to="/" className="flex items-center group">
           <img 
-            src="/logo-compact.svg" 
+            src="/logo.png" 
             alt="GL PeerBajaj" 
-            className="h-8 w-auto"
+            className="h-12 w-auto transition-transform duration-300 group-hover:scale-110"
           />
         </Link>
         
