@@ -18,7 +18,7 @@ export default function StudyMaterials() {
   }
 
   return (
-    <div className="space-y-8">
+    <div id='StudyMaterials' className="space-y-8">
       {/* Main Heading */}
       <div className="section-header text-center">
         <span className="section-badge">🏫</span>

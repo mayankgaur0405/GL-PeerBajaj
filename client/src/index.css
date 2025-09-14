@@ -257,6 +257,177 @@ html, body, #root { @apply bg-gray-50 text-gray-900 transition-colors; }
   }
 }
 
+/* Guide page specific styles */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Print styles for Guide page */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-before: always;
+  }
+  
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .bg-gradient-to-br,
+  .bg-gradient-to-r,
+  .bg-gradient-to-l {
+    background: white !important;
+  }
+  
+  .text-white {
+    color: black !important;
+  }
+  
+  .text-gray-900,
+  .text-gray-600,
+  .text-gray-500 {
+    color: black !important;
+  }
+  
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .rounded-2xl,
+  .rounded-xl,
+  .rounded-lg {
+    border-radius: 4px !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeInUp,
+  .animate-slideInLeft,
+  .animate-slideInRight,
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
+  
+  .transition-all,
+  .transition-colors,
+  .transition-transform {
+    transition: none !important;
+  }
+}
+
+/* Focus styles for better accessibility */
+.focus-visible:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-white\/80,
+  .bg-white\/10 {
+    background: white !important;
+  }
+  
+  .bg-slate-800\/80,
+  .bg-slate-800\/10 {
+    background: black !important;
+  }
+  
+  .text-white\/80,
+  .text-white\/70 {
+    color: white !important;
+  }
+  
+  .text-gray-600,
+  .text-gray-500 {
+    color: black !important;
+  }
+}
+
 /* end theme overrides */
 
 

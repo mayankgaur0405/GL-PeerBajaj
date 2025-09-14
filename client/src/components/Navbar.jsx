@@ -106,6 +106,25 @@ export default function Navbar() {
                 <span>Team</span>
               </NavLink>
 
+              <NavLink 
+                to="/guide" 
+                className={({ isActive }) => 
+                  `flex items-center space-x-1 transition-base group relative ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
+                }
+                title="How the site works"
+                aria-label="User Guide - Learn how to use the platform"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Guide</span>
+                {/* Tooltip */}
+                <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50">
+                  How the site works
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </NavLink>
+
               <Link 
                 to="/chat" 
                 className="relative flex items-center space-x-1 text-white/80 hover:text-blue-400 transition-base"

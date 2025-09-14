@@ -60,7 +60,7 @@ export function PlacementPrepSection() {
   const [active, setActive] = useState(null)
   const entries = Object.entries(placementResources)
   return (
-    <div className="space-y-4 band">
+    <div id='PlacementPrepSection' className="space-y-4 band">
       <div className="section-header">
         <span className="section-badge">🎯</span>
         <h3 className="text-white font-semibold">Placement Preparation</h3>
@@ -117,7 +117,7 @@ export function HeroSection() {
           <a href="#careers" className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/15 text-white border border-white/10">Explore Careers</a>
         </div>
         <div className="flex items-center justify-center gap-4 pt-2 text-white/70">
-          <a href="https://instagram.com/glpeerbajaj" target="_blank" rel="noreferrer" className="hover:text-white">📸</a>
+          <a href="https://www.instagram.com/gl.peerbajaj/" target="_blank" rel="noreferrer" className="hover:text-white">📸</a>
           <a href="https://www.linkedin.com/company/glpeerbajaj" target="_blank" rel="noreferrer" className="hover:text-white">💼</a>
           <a href="mailto:glpeerbajaj@gmail.com" className="hover:text-white">✉️</a>
           <a href="#features" className="hover:text-white">⚙️</a>
@@ -465,7 +465,7 @@ export function FooterSection() {
           <div className="text-xl font-semibold">GL PeerBajaj</div>
           <p className="text-white/80 text-sm">A student community for curated learning, peer mentorship, and placement preparation.</p>
           <div className="flex items-center gap-3">
-            <a href="https://instagram.com/glpeerbajaj" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
+            <a href="https://www.instagram.com/gl.peerbajaj/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
               <span>📸</span><span>Instagram</span>
             </a>
             <a href="https://www.linkedin.com/company/glpeerbajaj" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
@@ -482,7 +482,7 @@ export function FooterSection() {
             <li><a href="#careers" className="hover:text-white">Career Paths</a></li>
             <li><a href="#internships" className="hover:text-white">Internships</a></li>
             <li><a href="#features" className="hover:text-white">Features</a></li>
-            <li><a href="#reviews" className="hover:text-white">Reviews</a></li>
+            <li><a href="#feedback" className="hover:text-white">Reviews</a></li>
           </ul>
         </div>
 
@@ -492,9 +492,9 @@ export function FooterSection() {
             <li><a href="/trending" className="hover:text-white">Trending</a></li>
             <li><a href="/feed" className="hover:text-white">Your Feed</a></li>
             <li><a href="/team" className="hover:text-white">Our Team</a></li>
-            <li><a href="#" className="hover:text-white">Guides</a></li>
-            <li><a href="#" className="hover:text-white">Study Materials</a></li>
-            <li><a href="#" className="hover:text-white">Placement Prep</a></li>
+            <li><a href="/guide" className="hover:text-white">User Guide</a></li>
+            <li><a href="#StudyMaterials" className="hover:text-white">Study Materials</a></li>
+            <li><a href="#PlacementPrepSection" className="hover:text-white">Placement Prep</a></li>
           </ul>
         </div>
 
@@ -502,7 +502,7 @@ export function FooterSection() {
           <div className="text-white font-semibold mb-3">Contact</div>
           <ul className="space-y-2 text-white/80 text-sm">
             <li className="flex items-center gap-2"><span>✉️</span><a href="mailto:glpeerbajaj@gmail.com" className="hover:text-white">glpeerbajaj@gmail.com</a></li>
-            <li className="flex items-center gap-2"><span>☎️</span><a href="tel:+919876543210" className="hover:text-white">+91 98765 43210</a></li>
+            <li className="flex items-center gap-2"><span>☎️</span><a href="tel:+910000000000" className="hover:text-white">+91 0000000000</a></li>
             <li className="flex items-center gap-2"><span>📍</span><span>GL PeerBajaj, India</span></li>
           </ul>
         </div>

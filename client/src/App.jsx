@@ -8,6 +8,7 @@ import Feed from './pages/Feed.jsx';
 import Trending from './pages/Trending.jsx';
 import Chat from './pages/Chat.jsx';
 import Team from './pages/Team.jsx';
+import Guide from './pages/Guide.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
@@ -44,6 +45,7 @@ export default function App() {
               />
               <Route path="/trending" element={<Trending />} />
               <Route path="/team" element={<Team />} />
+              <Route path="/guide" element={<Guide />} />
               <Route
                 path="/chat"
                 element={
