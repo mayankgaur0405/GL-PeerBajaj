@@ -39,8 +39,10 @@ const ChatSchema = new mongoose.Schema(
   { 
     timestamps: true,
     indexes: [
-      { participants: 1 },
-      { 'lastMessage.timestamp': -1 }
+      { participants: 1, isActive: 1 },
+      { 'lastMessage.timestamp': -1 },
+      { participants: 1, 'lastMessage.timestamp': -1 },
+      { 'messages.sender': 1, 'messages.isRead': 1 }
     ]
   }
 );
@@ -110,15 +112,17 @@ ChatSchema.statics.findOrCreateChat = async function(user1Id, user2Id) {
 };
 
 // Static method to get user's chats
-ChatSchema.statics.getUserChats = function(userId, limit = 20) {
+ChatSchema.statics.getUserChats = function(userId, limit = 20, skip = 0) {
   return this.find({
     participants: userId,
     isActive: true
   })
   .sort({ 'lastMessage.timestamp': -1 })
+  .skip(skip)
   .limit(limit)
   .populate('participants', 'name username profilePicture')
-  .populate('lastMessage.sender', 'name username');
+  .populate('lastMessage.sender', 'name username')
+  .lean(); // Use lean() for better performance
 };
 
 export const Chat = mongoose.model('Chat', ChatSchema);

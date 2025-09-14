@@ -73,9 +73,11 @@ export default function Home() {
 
   return (
     <div className="snap-y snap-mandatory">
-      {/* Fullscreen Hero */}
-      <div className="snap-start">
+      {/* Fullscreen Hero with enhanced spacing */}
+      <div className="snap-start relative">
         <HeroSection />
+        {/* Decorative bottom border */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
       </div>
 
       {/* Tabs */}

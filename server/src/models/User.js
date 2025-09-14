@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { validateGLBITMEmail } from '../utils/emailValidation.js';
 
 // Resource Schema
 const ResourceSchema = new mongoose.Schema(
@@ -25,7 +26,18 @@ const SectionSchema = new mongoose.Schema(
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true, index: true },
+    email: { 
+      type: String, 
+      required: true, 
+      unique: true, 
+      index: true,
+      validate: {
+        validator: function(email) {
+          return validateGLBITMEmail(email).isValid;
+        },
+        message: 'Please use your college email ending with @glbitm.ac.in'
+      }
+    },
     password: { type: String, required: true },
     username: { type: String, required: true, unique: true, index: true },
     year: { type: String, default: '' },

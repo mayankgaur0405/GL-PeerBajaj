@@ -23,15 +23,25 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (emailOrUsername, password) => {
-    const res = await api.post('/auth/login', { emailOrUsername, password }, { withCredentials: true });
-    setUser(res.data.user);
-    return res;
+    try {
+      const res = await api.post('/auth/login', { emailOrUsername, password }, { withCredentials: true });
+      setUser(res.data.user);
+      return res;
+    } catch (error) {
+      // Re-throw the error to be handled by the component
+      throw error;
+    }
   };
 
   const signup = async (payload) => {
-    const res = await api.post('/auth/register', payload, { withCredentials: true });
-    setUser(res.data.user);
-    return res;
+    try {
+      const res = await api.post('/auth/register', payload, { withCredentials: true });
+      setUser(res.data.user);
+      return res;
+    } catch (error) {
+      // Re-throw the error to be handled by the component
+      throw error;
+    }
   };
 
   const logout = async () => {

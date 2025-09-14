@@ -2,7 +2,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSocket } from '../context/SocketContext.jsx'
-import api from '../lib/api.js'
+import { useUnreadCount } from '../context/UnreadCountContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
 import Notifications from './Notifications.jsx'
 import NotificationDropdown from './NotificationDropdown.jsx'
@@ -11,25 +11,18 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const { socket } = useSocket()
   const { theme, toggleTheme } = useTheme()
+  const { notificationCount, messageCount, incrementNotificationCount, incrementMessageCount, updateNotificationCount } = useUnreadCount()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [unreadChatCount, setUnreadChatCount] = useState(0)
-
-  useEffect(() => {
-    if (user) {
-      fetchUnreadCounts()
-    }
-  }, [user])
 
   useEffect(() => {
     if (socket) {
       socket.on('new_notification', () => {
-        setUnreadCount(prev => prev + 1)
+        incrementNotificationCount()
       })
 
       socket.on('new_message', () => {
-        setUnreadChatCount(prev => prev + 1)
+        incrementMessageCount()
       })
 
       return () => {
@@ -37,20 +30,7 @@ export default function Navbar() {
         socket.off('new_message')
       }
     }
-  }, [socket])
-
-  const fetchUnreadCounts = async () => {
-    try {
-      const [notificationsRes, chatRes] = await Promise.all([
-        api.get('/notifications/unread-count'),
-        api.get('/chat/unread-count')
-      ])
-      setUnreadCount(notificationsRes.data.unreadCount || 0)
-      setUnreadChatCount(chatRes.data.unreadCount || 0)
-    } catch (err) {
-      console.error('Failed to fetch unread counts:', err)
-    }
-  }
+  }, [socket, incrementNotificationCount, incrementMessageCount])
 
   return (
     <header className="backdrop-blur bg-slate-900/70 border-b border-white/10 sticky top-0 z-40">
@@ -141,9 +121,9 @@ export default function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 <span>Messages</span>
-                {unreadChatCount > 0 && (
+                {messageCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                    {messageCount > 9 ? '9+' : messageCount}
                   </span>
                 )}
               </Link>
@@ -157,9 +137,9 @@ export default function Navbar() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM4 7h6V5H4v2zM4 13h6v-2H4v2z" />
                   </svg>
                   <span>Notifications</span>
-                  {unreadCount > 0 && (
+                  {notificationCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
+                      {notificationCount > 9 ? '9+' : notificationCount}
                     </span>
                   )}
                 </button>
@@ -167,6 +147,7 @@ export default function Navbar() {
                 <NotificationDropdown 
                   isOpen={showNotificationDropdown}
                   onClose={() => setShowNotificationDropdown(false)}
+                  onUnreadCountChange={updateNotificationCount}
                 />
               </div>
 

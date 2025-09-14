@@ -1,5 +1,6 @@
 import { User } from '../models/User.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/tokens.js';
+import { validateGLBITMEmail, validateEmailForAuth } from '../utils/emailValidation.js';
 
 export async function register(req, res, next) {
   try {
@@ -7,6 +8,13 @@ export async function register(req, res, next) {
     if (!name || !email || !password || !username) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
+    
+    // Validate email domain
+    const emailValidation = validateGLBITMEmail(email);
+    if (!emailValidation.isValid) {
+      return res.status(400).json({ message: emailValidation.message });
+    }
+    
     const exists = await User.findOne({ $or: [{ email }, { username }] });
     if (exists) return res.status(409).json({ message: 'Email or username already in use' });
     const user = await User.create({ name, email, password, username });
@@ -26,6 +34,13 @@ export async function login(req, res, next) {
   try {
     const { emailOrUsername, password } = req.body;
     if (!emailOrUsername || !password) return res.status(400).json({ message: 'Missing credentials' });
+    
+    // Validate email domain if it looks like an email
+    const emailValidation = validateEmailForAuth(emailOrUsername);
+    if (!emailValidation.isValid) {
+      return res.status(400).json({ message: emailValidation.message });
+    }
+    
     const user = await User.findOne({
       $or: [{ email: emailOrUsername }, { username: emailOrUsername }]
     });

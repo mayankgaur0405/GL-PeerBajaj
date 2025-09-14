@@ -108,28 +108,140 @@ export function PlacementPrepSection() {
 
 export function HeroSection() {
   return (
-    <section className="min-h-screen flex items-center justify-center text-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900/80 to-slate-900" />
-      <div className="relative z-10 max-w-3xl mx-auto px-4 space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-white/80 text-xs">
-          <span>✨</span>
-          <span>Learn together. Grow faster.</span>
+    <section 
+      className="min-h-screen flex items-center justify-center text-center relative overflow-hidden pt-20"
+      role="banner"
+      aria-label="GL PeerBajaj - Student Resource Hub"
+    >
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900 animate-gradient-shift" />
+      
+      {/* Floating geometric shapes with parallax */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-500/10 rounded-full animate-float animate-delay-100 blur-sm"></div>
+        <div className="absolute top-40 right-20 w-16 h-16 bg-purple-500/10 rounded-lg rotate-45 animate-float animate-delay-300 blur-sm"></div>
+        <div className="absolute bottom-40 left-20 w-12 h-12 bg-cyan-500/10 rounded-full animate-float animate-delay-500 blur-sm"></div>
+        <div className="absolute top-60 right-1/3 w-8 h-8 bg-pink-500/10 rounded-lg animate-float animate-delay-200 blur-sm"></div>
+        <div className="absolute bottom-60 right-10 w-24 h-24 bg-indigo-500/10 rounded-full animate-float animate-delay-400 blur-sm"></div>
+        <div className="absolute top-1/3 left-1/4 w-14 h-14 bg-emerald-500/10 rounded-lg rotate-12 animate-float animate-delay-600 blur-sm"></div>
+        
+        {/* Additional floating elements for depth */}
+        <div className="absolute top-32 left-1/3 w-6 h-6 bg-yellow-500/10 rounded-full animate-float animate-delay-700"></div>
+        <div className="absolute bottom-32 right-1/4 w-10 h-10 bg-red-500/10 rounded-lg rotate-45 animate-float animate-delay-800"></div>
+        <div className="absolute top-1/2 left-1/6 w-4 h-4 bg-green-500/10 rounded-full animate-float animate-delay-900"></div>
+      </div>
+
+      {/* Parallax layers */}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent"></div>
+      
+      {/* Subtle particle effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/20 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+      
+      <div className="relative z-10 max-w-4xl mx-auto px-4 space-y-8">
+        {/* Subtle glow effect around content */}
+        <div className="absolute inset-0 -m-8 bg-gradient-radial from-blue-500/5 via-transparent to-transparent rounded-full blur-3xl"></div>
+        {/* Badge with animation */}
+        <div className="animate-fade-in-down animate-delay-100">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/20 text-white/90 text-sm backdrop-blur-sm">
+            <span className="text-lg">✨</span>
+            <span className="font-medium">Learn together. Grow faster.</span>
+          </div>
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white">
-          GL PeerBajaj
-        </h1>
-        <p className="text-white/80 text-lg">
-          Your comprehensive resource hub for B.Tech students — from study materials to career opportunities.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <a href="#internships" className="px-5 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white">Explore Internships</a>
-          <a href="#careers" className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/15 text-white border border-white/10">Explore Careers</a>
+
+        {/* Main heading with staggered animation */}
+        <div className="space-y-4">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white animate-fade-in-up animate-delay-200">
+            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
+              GL PeerBajaj
+            </span>
+          </h1>
+          
+          {/* Founder mention */}
+          <div className="animate-fade-in-up animate-delay-300">
+            <p className="text-white/60 text-sm md:text-base font-medium">
+              Founded by <span className="text-blue-300 font-semibold">Mayank Gaur</span>
+            </p>
+          </div>
         </div>
-        <div className="flex items-center justify-center gap-4 pt-2 text-white/70">
-          <a href="https://www.instagram.com/gl.peerbajaj/" target="_blank" rel="noreferrer" className="hover:text-white">📸</a>
-          <a href="https://www.linkedin.com/company/glpeerbajaj" target="_blank" rel="noreferrer" className="hover:text-white">💼</a>
-          <a href="mailto:glpeerbajaj@gmail.com" className="hover:text-white">✉️</a>
-          <a href="#features" className="hover:text-white">⚙️</a>
+
+        {/* Subtitle with animation */}
+        <div className="animate-fade-in-up animate-delay-400">
+          <p className="text-white/80 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+            Your comprehensive resource hub for B.Tech students — from study materials to career opportunities. 
+            <span className="text-blue-300 font-medium"> Innovating education, one student at a time.</span>
+          </p>
+        </div>
+
+        {/* Action buttons with staggered animation */}
+        <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-up animate-delay-500">
+          <a 
+            href="/team" 
+            className="group px-8 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 animate-pulse-glow"
+          >
+            <span className="flex items-center gap-2">
+              👥 Team Page
+            </span>
+          </a>
+          <a 
+            href="/guide" 
+            className="group px-8 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-lg border border-white/20 hover:border-white/30 backdrop-blur-sm transform hover:scale-105 transition-all duration-300"
+          >
+            <span className="flex items-center gap-2">
+              📖 Guide Page
+            </span>
+          </a>
+        </div>
+
+        {/* Social links with animation */}
+        <div className="flex items-center justify-center gap-6 pt-4 animate-fade-in-up animate-delay-600">
+          <a 
+            href="https://www.instagram.com/gl.peerbajaj/" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="group p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transform hover:scale-110 transition-all duration-300"
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform duration-300">📸</span>
+          </a>
+          <a 
+            href="https://www.linkedin.com/company/glpeerbajaj" 
+            target="_blank" 
+            rel="noreferrer" 
+            className="group p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transform hover:scale-110 transition-all duration-300"
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform duration-300">💼</span>
+          </a>
+          <a 
+            href="mailto:glpeerbajaj@gmail.com" 
+            className="group p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transform hover:scale-110 transition-all duration-300"
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform duration-300">✉️</span>
+          </a>
+          <a 
+            href="#features" 
+            className="group p-3 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transform hover:scale-110 transition-all duration-300"
+          >
+            <span className="text-xl group-hover:scale-110 transition-transform duration-300">⚙️</span>
+          </a>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
+          </div>
         </div>
       </div>
     </section>

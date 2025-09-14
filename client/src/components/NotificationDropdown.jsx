@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useSocket } from '../context/SocketContext.jsx';
+import { useUnreadCount } from '../context/UnreadCountContext.jsx';
 import api from '../lib/api.js';
 import { FaBell, FaTimes, FaCheck, FaUser, FaHeart, FaComment, FaPlus } from 'react-icons/fa';
 
-export default function NotificationDropdown({ isOpen, onClose }) {
+export default function NotificationDropdown({ isOpen, onClose, onUnreadCountChange }) {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const { notificationCount, updateNotificationCount } = useUnreadCount();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -23,14 +24,14 @@ export default function NotificationDropdown({ isOpen, onClose }) {
     if (socket) {
       socket.on('new_notification', (notification) => {
         setNotifications(prev => [notification, ...prev]);
-        setUnreadCount(prev => prev + 1);
+        updateNotificationCount(notificationCount + 1);
       });
 
       return () => {
         socket.off('new_notification');
       };
     }
-  }, [socket]);
+  }, [socket, notificationCount, updateNotificationCount]);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -47,7 +48,12 @@ export default function NotificationDropdown({ isOpen, onClose }) {
   const fetchUnreadCount = async () => {
     try {
       const response = await api.get('/notifications/unread-count');
-      setUnreadCount(response.data.unreadCount);
+      const count = response.data.unreadCount;
+      updateNotificationCount(count);
+      // Notify parent component of count change
+      if (onUnreadCountChange) {
+        onUnreadCountChange(count);
+      }
     } catch (error) {
       console.error('Failed to fetch unread count:', error);
     }
@@ -63,7 +69,12 @@ export default function NotificationDropdown({ isOpen, onClose }) {
             : notif
         )
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      const newCount = Math.max(0, notificationCount - 1);
+      updateNotificationCount(newCount);
+      // Notify parent component of count change
+      if (onUnreadCountChange) {
+        onUnreadCountChange(newCount);
+      }
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
     }
@@ -75,7 +86,11 @@ export default function NotificationDropdown({ isOpen, onClose }) {
       setNotifications(prev => 
         prev.map(notif => ({ ...notif, readStatus: true }))
       );
-      setUnreadCount(0);
+      updateNotificationCount(0);
+      // Notify parent component of count change
+      if (onUnreadCountChange) {
+        onUnreadCountChange(0);
+      }
     } catch (error) {
       console.error('Failed to mark all as read:', error);
     }
@@ -155,7 +170,7 @@ export default function NotificationDropdown({ isOpen, onClose }) {
             Notifications
           </h3>
           <div className="flex items-center gap-2">
-            {unreadCount > 0 && (
+            {notificationCount > 0 && (
               <button
                 onClick={markAllAsRead}
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"

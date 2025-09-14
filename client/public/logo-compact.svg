@@ -1,56 +1,73 @@
-<svg width="180" height="40" viewBox="0 0 180 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- GLP Block Logo (compact) -->
-  <g transform="translate(5, 5)">
+<svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="50" fill="#0F0F23"/>
+  
+  <!-- GLPB Pixelated Logo (compact) -->
+  <g transform="translate(10, 8)">
     <!-- Letter G blocks -->
-    <rect x="0" y="0" width="6" height="6" fill="#8B5CF6"/>
-    <rect x="6" y="0" width="6" height="6" fill="#7C3AED"/>
-    <rect x="12" y="0" width="6" height="6" fill="#6D28D9"/>
-    <rect x="0" y="6" width="6" height="6" fill="#8B5CF6"/>
-    <rect x="0" y="12" width="6" height="6" fill="#8B5CF6"/>
-    <rect x="0" y="18" width="6" height="6" fill="#8B5CF6"/>
-    <rect x="6" y="18" width="6" height="6" fill="#7C3AED"/>
-    <rect x="12" y="18" width="6" height="6" fill="#6D28D9"/>
-    <rect x="12" y="12" width="6" height="6" fill="#6D28D9"/>
-    <rect x="12" y="6" width="6" height="6" fill="#6D28D9"/>
+    <rect x="0" y="0" width="8" height="8" fill="#8B5CF6"/>
+    <rect x="8" y="0" width="8" height="8" fill="#7C3AED"/>
+    <rect x="16" y="0" width="8" height="8" fill="#6D28D9"/>
+    <rect x="0" y="8" width="8" height="8" fill="#8B5CF6"/>
+    <rect x="0" y="16" width="8" height="8" fill="#8B5CF6"/>
+    <rect x="0" y="24" width="8" height="8" fill="#8B5CF6"/>
+    <rect x="8" y="24" width="8" height="8" fill="#7C3AED"/>
+    <rect x="16" y="24" width="8" height="8" fill="#6D28D9"/>
+    <rect x="16" y="16" width="8" height="8" fill="#6D28D9"/>
+    <rect x="16" y="8" width="8" height="8" fill="#6D28D9"/>
     
     <!-- Letter L blocks -->
-    <rect x="24" y="0" width="6" height="6" fill="#5B21B6"/>
-    <rect x="30" y="0" width="6" height="6" fill="#4C1D95"/>
-    <rect x="36" y="0" width="6" height="6" fill="#3B82F6"/>
-    <rect x="24" y="6" width="6" height="6" fill="#5B21B6"/>
-    <rect x="24" y="12" width="6" height="6" fill="#5B21B6"/>
-    <rect x="24" y="18" width="6" height="6" fill="#5B21B6"/>
-    <rect x="30" y="18" width="6" height="6" fill="#4C1D95"/>
-    <rect x="36" y="18" width="6" height="6" fill="#3B82F6"/>
+    <rect x="32" y="0" width="8" height="8" fill="#5B21B6"/>
+    <rect x="40" y="0" width="8" height="8" fill="#4C1D95"/>
+    <rect x="48" y="0" width="8" height="8" fill="#3B82F6"/>
+    <rect x="32" y="8" width="8" height="8" fill="#5B21B6"/>
+    <rect x="32" y="16" width="8" height="8" fill="#5B21B6"/>
+    <rect x="32" y="24" width="8" height="8" fill="#5B21B6"/>
+    <rect x="40" y="24" width="8" height="8" fill="#4C1D95"/>
+    <rect x="48" y="24" width="8" height="8" fill="#3B82F6"/>
     
     <!-- Letter P blocks -->
-    <rect x="48" y="0" width="6" height="6" fill="#0EA5E9"/>
-    <rect x="54" y="0" width="6" height="6" fill="#0284C7"/>
-    <rect x="60" y="0" width="6" height="6" fill="#0369A1"/>
-    <rect x="48" y="6" width="6" height="6" fill="#0EA5E9"/>
-    <rect x="48" y="12" width="6" height="6" fill="#0EA5E9"/>
-    <rect x="48" y="18" width="6" height="6" fill="#0EA5E9"/>
-    <rect x="54" y="6" width="6" height="6" fill="#0284C7"/>
-    <rect x="60" y="6" width="6" height="6" fill="#0369A1"/>
-    <rect x="54" y="12" width="6" height="6" fill="#0284C7"/>
-    <rect x="60" y="12" width="6" height="6" fill="#0369A1"/>
+    <rect x="64" y="0" width="8" height="8" fill="#0EA5E9"/>
+    <rect x="72" y="0" width="8" height="8" fill="#0284C7"/>
+    <rect x="80" y="0" width="8" height="8" fill="#0369A1"/>
+    <rect x="64" y="8" width="8" height="8" fill="#0EA5E9"/>
+    <rect x="64" y="16" width="8" height="8" fill="#0EA5E9"/>
+    <rect x="64" y="24" width="8" height="8" fill="#0EA5E9"/>
+    <rect x="72" y="8" width="8" height="8" fill="#0284C7"/>
+    <rect x="80" y="8" width="8" height="8" fill="#0369A1"/>
+    <rect x="72" y="16" width="8" height="8" fill="#0284C7"/>
+    <rect x="80" y="16" width="8" height="8" fill="#0369A1"/>
+    
+    <!-- Letter B blocks -->
+    <rect x="96" y="0" width="8" height="8" fill="#10B981"/>
+    <rect x="104" y="0" width="8" height="8" fill="#059669"/>
+    <rect x="112" y="0" width="8" height="8" fill="#047857"/>
+    <rect x="96" y="8" width="8" height="8" fill="#10B981"/>
+    <rect x="96" y="16" width="8" height="8" fill="#10B981"/>
+    <rect x="96" y="24" width="8" height="8" fill="#10B981"/>
+    <rect x="104" y="8" width="8" height="8" fill="#059669"/>
+    <rect x="112" y="8" width="8" height="8" fill="#047857"/>
+    <rect x="104" y="16" width="8" height="8" fill="#059669"/>
+    <rect x="112" y="16" width="8" height="8" fill="#047857"/>
     
     <!-- Small connecting line -->
-    <line x1="3" y1="24" x2="30" y2="24" stroke="url(#compactLineGradient)" stroke-width="1"/>
-    <circle cx="3" cy="24" r="1.5" fill="#8B5CF6"/>
-    <circle cx="30" cy="24" r="1.5" fill="#0EA5E9"/>
+    <line x1="4" y1="32" x2="60" y2="32" stroke="url(#compactCircuitGradient)" stroke-width="2"/>
+    <circle cx="4" cy="32" r="2" fill="#8B5CF6"/>
+    <circle cx="60" cy="32" r="2" fill="#10B981"/>
   </g>
   
   <!-- Text -->
-  <text x="80" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">GL</text>
-  <text x="100" y="18" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="white">PeerBajaj</text>
+  <text x="130" y="20" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">GL</text>
+  <text x="150" y="20" font-family="Arial, sans-serif" font-size="12" font-weight="400" fill="white">PeerBajaj</text>
   
   <!-- Gradient definitions -->
   <defs>
-    <linearGradient id="compactLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="compactCircuitGradient" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0EA5E9;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0EA5E9;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
     </linearGradient>
   </defs>
 </svg>

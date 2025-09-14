@@ -13,6 +13,7 @@ import PostDetail from './pages/PostDetail.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
+import { UnreadCountProvider } from './context/UnreadCountContext.jsx';
 
 // Private route component
 function PrivateRoute({ children }) {
@@ -28,9 +29,10 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <SocketProvider>
-          <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
-            <Navbar />
-            <main className="container mx-auto px-4 py-6 flex-1">
+          <UnreadCountProvider>
+            <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
+              <Navbar />
+              <main className="container mx-auto px-4 py-6 flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/profile/:id" element={<Profile />} />
@@ -62,8 +64,9 @@ export default function App() {
               {/* Optional: Catch-all route */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-            </main>
-          </div>
+              </main>
+            </div>
+          </UnreadCountProvider>
         </SocketProvider>
       </AuthProvider>
     </ThemeProvider>

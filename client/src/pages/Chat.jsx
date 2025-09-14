@@ -2,25 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useSocket } from '../context/SocketContext.jsx';
+import { useUnreadCount } from '../context/UnreadCountContext.jsx';
 import api from '../lib/api.js';
 import ChatBox from '../components/ChatBox.jsx';
 
 export default function Chat() {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const { messageCount, updateMessageCount, fetchUnreadCounts } = useUnreadCount();
   const [searchParams] = useSearchParams();
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     fetchChats();
-    fetchUnreadCount();
-  }, []);
+    fetchUnreadCounts();
+  }, [fetchUnreadCounts]);
 
   // Auto-open chat when navigated with ?userId=
   useEffect(() => {
@@ -51,7 +55,7 @@ export default function Chat() {
         
         // Update unread count
         if (selectedChat?._id !== data.chatId) {
-          setUnreadCount(prev => prev + 1);
+          updateMessageCount(messageCount + 1);
         }
       });
 
@@ -59,41 +63,61 @@ export default function Chat() {
         socket.off('new_message');
       };
     }
-  }, [socket, selectedChat]);
+  }, [socket, selectedChat, messageCount, updateMessageCount]);
 
-  const fetchChats = async () => {
+  const fetchChats = async (page = 1, append = false) => {
     try {
-      setLoading(true);
-      const response = await api.get('/chat');
-      const raw = response.data.chats || [];
-      // Dedupe by other user to avoid duplicate rows showing for same person
-      const byOther = new Map();
-      for (const chat of raw) {
-        const other = getOtherUserFrom(chat);
-        const key = other?._id || chat._id;
-        const existing = byOther.get(key);
-        if (!existing) {
-          byOther.set(key, chat);
-        } else {
-          const a = existing.lastMessage?.timestamp ? new Date(existing.lastMessage.timestamp).getTime() : 0;
-          const b = chat.lastMessage?.timestamp ? new Date(chat.lastMessage.timestamp).getTime() : 0;
-          if (b > a) byOther.set(key, chat);
-        }
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
       }
-      setChats(Array.from(byOther.values()));
+      
+      const response = await api.get('/chat', {
+        params: { page, limit: 20 }
+      });
+      const raw = response.data.chats || [];
+      const pagination = response.data.pagination;
+      
+      if (append) {
+        setChats(prev => [...prev, ...raw]);
+      } else {
+        // Dedupe by other user to avoid duplicate rows showing for same person
+        const byOther = new Map();
+        for (const chat of raw) {
+          const other = getOtherUserFrom(chat);
+          const key = other?._id || chat._id;
+          const existing = byOther.get(key);
+          if (!existing) {
+            byOther.set(key, chat);
+          } else {
+            const a = existing.lastMessage?.timestamp ? new Date(existing.lastMessage.timestamp).getTime() : 0;
+            const b = chat.lastMessage?.timestamp ? new Date(chat.lastMessage.timestamp).getTime() : 0;
+            if (b > a) byOther.set(key, chat);
+          }
+        }
+        setChats(Array.from(byOther.values()));
+      }
+      
+      // Update pagination state
+      setCurrentPage(page);
+      setHasMore(pagination ? page < pagination.pages : false);
     } catch (err) {
       console.error('Failed to fetch chats:', err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  const fetchUnreadCount = async () => {
+  // Function to mark messages as read when chat is opened
+  const markMessagesAsRead = async (chatId) => {
     try {
-      const response = await api.get('/chat/unread-count');
-      setUnreadCount(response.data.unreadCount || 0);
+      await api.put(`/chat/${chatId}/read`);
+      // Refresh the unread count after marking as read
+      fetchUnreadCounts();
     } catch (err) {
-      console.error('Failed to fetch unread count:', err);
+      console.error('Failed to mark messages as read:', err);
     }
   };
 
@@ -112,6 +136,8 @@ export default function Chat() {
       });
       
       setSelectedChat(newChat);
+      // Mark messages as read when opening a chat
+      markMessagesAsRead(newChat._id);
     } catch (err) {
       console.error('Failed to start new chat:', err);
     }
@@ -161,6 +187,12 @@ export default function Chat() {
     return 0;
   };
 
+  const loadMoreChats = () => {
+    if (!loadingMore && hasMore) {
+      fetchChats(currentPage + 1, true);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-6xl mx-auto">
@@ -206,9 +238,9 @@ export default function Chat() {
           <div className="p-4 border-b glass-divider space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">Conversations</h2>
-              {unreadCount > 0 && (
+              {messageCount > 0 && (
                 <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                  {unreadCount}
+                  {messageCount}
                 </span>
               )}
             </div>
@@ -256,7 +288,10 @@ export default function Chat() {
                   return (
                     <div
                       key={chat._id}
-                      onClick={() => setSelectedChat(chat)}
+                      onClick={() => {
+                        setSelectedChat(chat);
+                        markMessagesAsRead(chat._id);
+                      }}
                       className={`p-4 cursor-pointer transition-colors ${
                         selectedChat?._id === chat._id ? 'bg-white/10 border-r-2 border-blue-500' : 'hover:bg-white/5'
                       }`}
@@ -296,6 +331,19 @@ export default function Chat() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+            
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="p-4 text-center">
+                <button
+                  onClick={loadMoreChats}
+                  disabled={loadingMore}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? 'Loading...' : 'Load More Chats'}
+                </button>
               </div>
             )}
           </div>

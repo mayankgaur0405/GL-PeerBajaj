@@ -1,5 +1,8 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- GLP Block Logo (favicon) -->
+  <!-- Background -->
+  <rect width="32" height="32" fill="#0F0F23"/>
+  
+  <!-- GLPB Block Logo (favicon) -->
   <g transform="translate(2, 2)">
     <!-- Letter G blocks -->
     <rect x="0" y="0" width="4" height="4" fill="#8B5CF6"/>
@@ -35,18 +38,32 @@
     <rect x="4" y="26" width="4" height="4" fill="#0284C7"/>
     <rect x="8" y="26" width="4" height="4" fill="#0369A1"/>
     
+    <!-- Letter B blocks -->
+    <rect x="16" y="18" width="4" height="4" fill="#10B981"/>
+    <rect x="20" y="18" width="4" height="4" fill="#059669"/>
+    <rect x="24" y="18" width="4" height="4" fill="#047857"/>
+    <rect x="16" y="22" width="4" height="4" fill="#10B981"/>
+    <rect x="16" y="26" width="4" height="4" fill="#10B981"/>
+    <rect x="16" y="30" width="4" height="4" fill="#10B981"/>
+    <rect x="20" y="22" width="4" height="4" fill="#059669"/>
+    <rect x="24" y="22" width="4" height="4" fill="#047857"/>
+    <rect x="20" y="26" width="4" height="4" fill="#059669"/>
+    <rect x="24" y="26" width="4" height="4" fill="#047857"/>
+    
     <!-- Small connecting line -->
-    <line x1="2" y1="16" x2="12" y2="16" stroke="url(#faviconLineGradient)" stroke-width="1"/>
+    <line x1="2" y1="16" x2="12" y2="16" stroke="url(#faviconCircuitGradient)" stroke-width="1"/>
     <circle cx="2" cy="16" r="1" fill="#8B5CF6"/>
-    <circle cx="12" cy="16" r="1" fill="#0EA5E9"/>
+    <circle cx="12" cy="16" r="1" fill="#10B981"/>
   </g>
   
   <!-- Gradient definitions -->
   <defs>
-    <linearGradient id="faviconLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="faviconCircuitGradient" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0EA5E9;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0EA5E9;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
     </linearGradient>
   </defs>
 </svg>

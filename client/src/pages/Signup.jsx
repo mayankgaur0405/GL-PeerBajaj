@@ -1,19 +1,38 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { validateGLBITMEmail } from '../utils/emailValidation.js'
 
 export default function Signup() {
   const { signup } = useAuth()
   const nav = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', username: '', password: '' })
   const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }))
+  const update = (k, v) => {
+    setForm((f) => ({ ...f, [k]: v }))
+    
+    // Validate email in real-time
+    if (k === 'email') {
+      const validation = validateGLBITMEmail(v)
+      setEmailError(validation.isValid ? '' : validation.message)
+    }
+  }
 
   const submit = async (e) => {
     e.preventDefault()
     setError('')
+    setEmailError('')
+    
+    // Validate email before submission
+    const emailValidation = validateGLBITMEmail(form.email)
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.message)
+      return
+    }
+    
     try {
       await signup(form)
       nav('/')
@@ -42,12 +61,19 @@ export default function Signup() {
         <div>
           <label className="block text-sm mb-1 text-slate-700 dark:text-slate-200">Email</label>
           <input 
-            className="w-full rounded-lg px-3 py-2 bg-white dark:bg-slate-800/80 border border-slate-300 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500/60 text-slate-900 dark:text-slate-100 placeholder-slate-400" 
+            className={`w-full rounded-lg px-3 py-2 bg-white dark:bg-slate-800/80 border focus:outline-none focus:ring-2 text-slate-900 dark:text-slate-100 placeholder-slate-400 ${
+              emailError 
+                ? 'border-red-300 dark:border-red-500 focus:ring-red-500/60' 
+                : 'border-slate-300 dark:border-white/10 focus:ring-blue-500/60'
+            }`}
             type="email" 
-            placeholder="you@example.com" 
+            placeholder="you@glbitm.ac.in" 
             value={form.email} 
             onChange={(e)=>update('email', e.target.value)} 
           />
+          {emailError && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{emailError}</p>
+          )}
         </div>
         
         <div>

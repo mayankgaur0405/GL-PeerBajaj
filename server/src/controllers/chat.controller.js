@@ -6,11 +6,24 @@ import { Notification } from '../models/Notification.js';
 // GET USER CHATS
 export async function getUserChats(req, res, next) {
   try {
-    const { limit = 20 } = req.query;
+    const { limit = 20, page = 1 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
     
-    const chats = await Chat.getUserChats(req.userId, parseInt(limit));
+    const chats = await Chat.getUserChats(req.userId, parseInt(limit), skip);
+    const totalCount = await Chat.countDocuments({
+      participants: req.userId,
+      isActive: true
+    });
     
-    res.json({ chats });
+    res.json({ 
+      chats,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: totalCount,
+        pages: Math.ceil(totalCount / parseInt(limit))
+      }
+    });
   } catch (err) {
     next(err);
   }
@@ -252,20 +265,29 @@ export async function deleteChat(req, res, next) {
 // GET UNREAD MESSAGE COUNT
 export async function getUnreadCount(req, res, next) {
   try {
-    const chats = await Chat.find({
-      participants: req.userId,
-      isActive: true
-    });
+    // Use aggregation pipeline for efficient counting
+    const result = await Chat.aggregate([
+      {
+        $match: {
+          participants: new mongoose.Types.ObjectId(req.userId),
+          isActive: true
+        }
+      },
+      {
+        $unwind: '$messages'
+      },
+      {
+        $match: {
+          'messages.sender': { $ne: new mongoose.Types.ObjectId(req.userId) },
+          'messages.isRead': false
+        }
+      },
+      {
+        $count: 'unreadCount'
+      }
+    ]);
 
-    let unreadCount = 0;
-    
-    for (const chat of chats) {
-      const unreadMessages = chat.messages.filter(
-        message => message.sender.toString() !== req.userId && !message.isRead
-      );
-      unreadCount += unreadMessages.length;
-    }
-
+    const unreadCount = result.length > 0 ? result[0].unreadCount : 0;
     res.json({ unreadCount });
   } catch (err) {
     next(err);

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useSocket } from '../context/SocketContext.jsx';
+import { useUnreadCount } from '../context/UnreadCountContext.jsx';
 import api from '../lib/api.js';
 
 export default function ChatBox({ chatId, onClose }) {
   const { user } = useAuth();
   const { socket } = useSocket();
+  const { fetchUnreadCounts } = useUnreadCount();
   const [chat, setChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -78,6 +80,11 @@ export default function ChatBox({ chatId, onClose }) {
       const response = await api.get(`/chat/${chatId}/messages`);
       setChat(response.data.chat);
       setMessages(response.data.messages || []);
+      
+      // Mark messages as read when chat is opened
+      await api.put(`/chat/${chatId}/read`);
+      // Refresh unread counts
+      fetchUnreadCounts();
     } catch (err) {
       console.error('Failed to fetch chat data:', err);
     } finally {
