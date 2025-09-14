@@ -24,8 +24,10 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
         ...filters
       };
 
-      if (type === 'feed') {
-        endpoint = '/posts/feed/posts';
+      if (type === 'following') {
+        endpoint = '/feed/following';
+      } else if (type === 'global') {
+        endpoint = '/feed/global';
       } else if (type === 'user' && userId) {
         endpoint = `/posts/user/${userId}`;
       }
@@ -41,6 +43,16 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
 
       setHasMore(newPosts.length === 10);
       setError(null);
+      
+      // Debug logging for global feed
+      if (type === 'global' && user) {
+        const ownPosts = newPosts.filter(post => post.author?._id === user._id);
+        if (ownPosts.length > 0) {
+          console.warn('Server returned own posts in global feed:', ownPosts.length);
+        } else {
+          console.log('Global feed correctly excludes own posts');
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch posts:', err);
       setError('Failed to load posts');
@@ -130,8 +142,10 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
         </div>
         <h3 className="text-lg font-semibold text-white mb-1">No posts yet</h3>
         <p className="text-white/70 text-sm">
-          {type === 'feed' 
+          {type === 'following' 
             ? "Follow some users to see their posts in your feed"
+            : type === 'global'
+            ? "No posts from other users available at the moment"
             : "This user hasn't posted anything yet"
           }
         </p>
@@ -143,16 +157,30 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
     <div className="space-y-6">
       <div className="section-header">
         <span className="section-badge">📰</span>
-        <h3 className="text-white font-semibold">Your Feed</h3>
+        <h3 className="text-white font-semibold">
+          {type === 'following' ? 'Following Feed' : 
+           type === 'global' ? 'Global Feed' : 
+           'Your Feed'}
+        </h3>
       </div>
-      {posts.map((post, idx) => (
-        <div key={post._id} className="animate-[fadeInUp_.25s_ease-out]" style={{animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards'}}>
-          <PostCard 
-            post={post} 
-            onUpdate={handlePostUpdate}
-          />
-        </div>
-      ))}
+      {posts
+        .filter(post => {
+          // Additional client-side verification for global feed
+          if (type === 'global' && user && post.author?._id === user._id) {
+            console.warn('Client-side filter: Excluding own post from global feed:', post._id);
+            return false;
+          }
+          return true;
+        })
+        .map((post, idx) => (
+          <div key={post._id} className="animate-[fadeInUp_.25s_ease-out]" style={{animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards'}}>
+            <PostCard 
+              post={post} 
+              onUpdate={handlePostUpdate}
+              showFollowButton={type === 'global'}
+            />
+          </div>
+        ))}
 
       {loadingMore && (
         <div className="text-center py-4">

@@ -1,6 +1,15 @@
 import Modal from './Modal.jsx'
 import ResourceList from './ResourceList.jsx'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext.jsx'
+import api from '../lib/api.js'
+import FeedbackModal from './FeedbackModal.jsx'
+import AdvancedFeedbackModal from './AdvancedFeedbackModal.jsx'
+import FeedbackCarousel from './FeedbackCarousel.jsx'
+import QuickFeedbackModal from './QuickFeedbackModal.jsx'
+import TechnicalReportModal from './TechnicalReportModal.jsx'
+import QuickFeedbackDetailModal from './QuickFeedbackDetailModal.jsx'
+import TechnicalReportDetailModal from './TechnicalReportDetailModal.jsx'
 
 const placementResources = {
   'DSA': {
@@ -129,7 +138,7 @@ export function HeroSection() {
 
 export function AboutSection() {
   return (
-    <div id="about" className="glass-card p-6 text-white section-wrap hover-border-bright hover-tilt">
+    <div id="about" className="glass-card p-6 text-white section-wrap hover-glow hover-raise">
       <div className="section-header">
         <span className="section-badge">ℹ️</span>
         <h3 className="text-xl font-semibold">About GL PeerBajaj</h3>
@@ -141,17 +150,17 @@ export function AboutSection() {
           focus on practice over searching.
         </p>
         <div className="grid sm:grid-cols-3 gap-3">
-          <div className="glass-card px-4 py-3 text-center">
+          <div className="glass-card px-4 py-3 text-center hover-glow hover-raise">
             <div className="text-2xl">📚</div>
             <div className="font-semibold text-white">Curated Content</div>
             <div className="text-xs text-white/70">Notes, PDFs, and playlists</div>
           </div>
-          <div className="glass-card px-4 py-3 text-center">
+          <div className="glass-card px-4 py-3 text-center hover-glow hover-raise">
             <div className="text-2xl">🤝</div>
             <div className="font-semibold text-white">Peer Community</div>
             <div className="text-xs text-white/70">Learn together, faster</div>
           </div>
-          <div className="glass-card px-4 py-3 text-center">
+          <div className="glass-card px-4 py-3 text-center hover-glow hover-raise">
             <div className="text-2xl">🎯</div>
             <div className="font-semibold text-white">Placement Focus</div>
             <div className="text-xs text-white/70">Structured interview prep</div>
@@ -352,50 +361,412 @@ export function ReviewsSection() {
 }
 
 export function FeedbackSection() {
-  const feedback = [
-    { name: 'Aarav Sharma', role: 'CSE, Year 3', text: 'Found exactly what to study for placements. The community is super helpful.', rating: 5 },
-    { name: 'Isha Verma', role: 'ECE, Year 2', text: 'Neatly organized resources. Dark theme and clean UI are great!', rating: 5 },
-    { name: 'Rohit Mehra', role: 'AIML, Year 4', text: 'Discussions and quick feedback kept me consistent. Highly recommended.', rating: 5 },
-    { name: 'Sara Khan', role: 'IT, Year 1', text: 'As a beginner it felt easy to start. Learning is less overwhelming now.', rating: 4 }
-  ]
+  const { user } = useAuth();
+  const [quickFeedback, setQuickFeedback] = useState([]);
+  const [technicalFeedback, setTechnicalFeedback] = useState([]);
+  const [quickLoading, setQuickLoading] = useState(true);
+  const [technicalLoading, setTechnicalLoading] = useState(true);
+  const [showQuickModal, setShowQuickModal] = useState(false);
+  const [showTechnicalModal, setShowTechnicalModal] = useState(false);
+  const [showQuickDetailModal, setShowQuickDetailModal] = useState(false);
+  const [showTechnicalDetailModal, setShowTechnicalDetailModal] = useState(false);
+  const [selectedQuickFeedback, setSelectedQuickFeedback] = useState(null);
+  const [selectedTechnicalFeedback, setSelectedTechnicalFeedback] = useState(null);
+  const [quickCurrentIndex, setQuickCurrentIndex] = useState(0);
+  const [technicalCurrentIndex, setTechnicalCurrentIndex] = useState(0);
+
+  // Fallback static data
+  const staticQuickFeedback = [
+    { 
+      _id: '1',
+      name: 'Aarav Sharma', 
+      role: 'CSE, Year 3', 
+      text: 'Found exactly what to study for placements. The community is super helpful and responsive.',
+      rating: 5,
+      createdAt: new Date().toISOString()
+    },
+    { 
+      _id: '2',
+      name: 'Isha Verma', 
+      role: 'ECE, Year 2', 
+      text: 'Neatly organized resources. Dark theme and clean UI are great! Easy to navigate.',
+      rating: 5,
+      createdAt: new Date().toISOString()
+    }
+  ];
+
+  const staticTechnicalFeedback = [
+    { 
+      _id: '1',
+      name: 'Rohit Mehra', 
+      role: 'AIML, Year 4', 
+      issues: 'Login page sometimes takes too long to load on mobile devices.',
+      featureRequest: 'Would love to see dark mode toggle and better mobile navigation.',
+      nonFunctional: 'Search functionality not working properly on mobile Safari.',
+      generalFeedback: 'Great platform overall, very helpful for studies.',
+      severity: 'Medium',
+      deviceInfo: 'Chrome on Windows 11',
+      createdAt: new Date().toISOString()
+    }
+  ];
+
+  useEffect(() => {
+    fetchQuickFeedback();
+    fetchTechnicalFeedback();
+  }, []);
+
+  // Fallback to static data if no backend data after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (quickFeedback.length === 0 && !quickLoading) {
+        console.log('No quick feedback from backend, using static data');
+        setQuickFeedback(staticQuickFeedback);
+      }
+      if (technicalFeedback.length === 0 && !technicalLoading) {
+        console.log('No technical feedback from backend, using static data');
+        setTechnicalFeedback(staticTechnicalFeedback);
+      }
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [quickFeedback.length, technicalFeedback.length, quickLoading, technicalLoading]);
+
+  // Auto-rotate carousels
+  useEffect(() => {
+    if (quickFeedback.length > 1) {
+      const interval = setInterval(() => {
+        setQuickCurrentIndex((prevIndex) => (prevIndex + 1) % quickFeedback.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [quickFeedback.length]);
+
+  useEffect(() => {
+    if (technicalFeedback.length > 1) {
+      const interval = setInterval(() => {
+        setTechnicalCurrentIndex((prevIndex) => (prevIndex + 1) % technicalFeedback.length);
+      }, 7000);
+      return () => clearInterval(interval);
+    }
+  }, [technicalFeedback.length]);
+
+  const fetchQuickFeedback = async () => {
+    try {
+      setQuickLoading(true);
+      console.log('Fetching quick feedback...');
+      const response = await api.get('/feedback?type=quick&limit=10');
+      console.log('Quick feedback response:', response.data);
+      console.log('Quick feedback array:', response.data.feedback);
+      console.log('Quick feedback length:', response.data.feedback?.length);
+      setQuickFeedback(response.data.feedback || []);
+    } catch (err) {
+      console.error('Failed to fetch quick feedback:', err);
+      console.log('Using static quick feedback as fallback');
+      setQuickFeedback(staticQuickFeedback);
+    } finally {
+      setQuickLoading(false);
+    }
+  };
+
+  const fetchTechnicalFeedback = async () => {
+    try {
+      setTechnicalLoading(true);
+      console.log('Fetching technical feedback...');
+      const response = await api.get('/feedback?type=technical&limit=10');
+      console.log('Technical feedback response:', response.data);
+      console.log('Technical feedback array:', response.data.feedback);
+      console.log('Technical feedback length:', response.data.feedback?.length);
+      setTechnicalFeedback(response.data.feedback || []);
+    } catch (err) {
+      console.error('Failed to fetch technical feedback:', err);
+      console.log('Using static technical feedback as fallback');
+      setTechnicalFeedback(staticTechnicalFeedback);
+    } finally {
+      setTechnicalLoading(false);
+    }
+  };
+
+  const handleQuickFeedbackSubmitted = () => {
+    console.log('Quick feedback submitted, refreshing data...');
+    // Add a small delay to ensure backend has processed the data
+    setTimeout(() => {
+      fetchQuickFeedback();
+    }, 1000);
+  };
+
+  const handleTechnicalFeedbackSubmitted = () => {
+    console.log('Technical feedback submitted, refreshing data...');
+    // Add a small delay to ensure backend has processed the data
+    setTimeout(() => {
+      fetchTechnicalFeedback();
+    }, 1000);
+  };
+
+  const truncateText = (text, maxLength = 100) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  };
+
+  const getSeverityColor = (severity) => {
+    switch (severity) {
+      case 'Critical': return 'text-red-400 bg-red-400/20 border-red-400/30';
+      case 'High': return 'text-orange-400 bg-orange-400/20 border-orange-400/30';
+      case 'Medium': return 'text-yellow-400 bg-yellow-400/20 border-yellow-400/30';
+      case 'Low': return 'text-green-400 bg-green-400/20 border-green-400/30';
+      default: return 'text-gray-400 bg-gray-400/20 border-gray-400/30';
+    }
+  };
+
   return (
     <section id="feedback" className="space-y-6 section-wrap">
       <div className="section-header">
         <span className="section-badge">🌟</span>
         <h3 className="text-white font-semibold">What students say about GL PeerBajaj</h3>
       </div>
+      
       {/* Featured quote */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900 p-6">
-        <div className="absolute -top-10 -left-6 text-7xl opacity-10">“</div>
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-r from-slate-900 via-slate-900/80 to-slate-900 p-6 hover-glow hover-raise">
+        <div className="absolute -top-10 -left-6 text-7xl opacity-10">"</div>
         <blockquote className="text-white/90 text-lg md:text-xl leading-relaxed">
-          “A focused place to learn with peers. I spend less time searching and more time practicing.”
+          "A focused place to learn with peers. I spend less time searching and more time practicing."
         </blockquote>
         <div className="mt-3 text-white/60 text-sm">— Community Feedback</div>
       </div>
-      {/* Testimonials grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {feedback.map((f, i) => (
-          <div key={i} className="group relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-rose-500/30">
-            <div className="h-full w-full rounded-2xl bg-slate-900 p-5 text-white">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center ring-1 ring-white/10">{f.name.charAt(0)}</div>
-                <div>
-                  <div className="font-medium">{f.name}</div>
-                  <div className="text-xs text-white/60">{f.role}</div>
-                </div>
-              </div>
-              <div className="flex gap-1 mb-2">
-                {Array.from({ length: f.rating }).map((_, idx) => (<span key={idx}>⭐</span>))}
-              </div>
-              <p className="text-white/80 text-sm leading-relaxed">{f.text}</p>
+
+      {/* Two Cards Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Quick Feedback Card */}
+        <div className="glass-card p-6 hover-glow hover-raise">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span className="text-blue-400">💬</span>
+              Quick Feedback
+            </h4>
+            <div className="flex gap-2">
+              <button
+                onClick={fetchQuickFeedback}
+                className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs transition-colors"
+              >
+                Refresh
+              </button>
+              <button
+                onClick={() => setShowQuickModal(true)}
+                className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm transition-colors"
+              >
+                Share
+              </button>
             </div>
           </div>
-        ))}
+
+          {quickLoading ? (
+            <div className="animate-pulse space-y-3">
+              <div className="h-4 bg-white/20 rounded w-3/4"></div>
+              <div className="h-4 bg-white/20 rounded w-1/2"></div>
+              <div className="h-4 bg-white/20 rounded w-2/3"></div>
+            </div>
+          ) : quickFeedback.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-2">💬</div>
+              <p className="text-white/70 text-sm">No quick feedback yet</p>
+              <p className="text-white/50 text-xs mt-2">Debug: Array length = {quickFeedback.length}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Debug info */}
+              <div className="text-xs text-white/50 mb-2">
+                Debug: Showing {quickCurrentIndex + 1} of {quickFeedback.length} feedback items
+              </div>
+              {/* Current Quick Feedback */}
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                    {quickFeedback[quickCurrentIndex]?.name?.charAt(0) || 'U'}
+                  </div>
+                  <div>
+                    <div className="font-medium text-white text-sm">{quickFeedback[quickCurrentIndex]?.name}</div>
+                    <div className="text-xs text-white/60">{quickFeedback[quickCurrentIndex]?.role}</div>
+                  </div>
+                </div>
+                <div className="flex gap-1 mb-2">
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <span
+                      key={idx}
+                      className={`text-sm ${
+                        idx < (quickFeedback[quickCurrentIndex]?.rating || 0)
+                          ? 'text-yellow-400'
+                          : 'text-white/20'
+                      }`}
+                    >
+                      ⭐
+                    </span>
+                  ))}
+                </div>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  {truncateText(quickFeedback[quickCurrentIndex]?.text)}
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedQuickFeedback(quickFeedback[quickCurrentIndex]);
+                    setShowQuickDetailModal(true);
+                  }}
+                  className="mt-2 text-blue-400 hover:text-blue-300 text-xs underline"
+                >
+                  View Full Feedback
+                </button>
+              </div>
+
+              {/* Navigation dots */}
+              {quickFeedback.length > 1 && (
+                <div className="flex justify-center gap-1">
+                  {quickFeedback.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setQuickCurrentIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === quickCurrentIndex ? 'bg-white' : 'bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Technical Feedback Card */}
+        <div className="glass-card p-6 hover-glow hover-raise">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span className="text-purple-400">🔧</span>
+              Technical Reports
+            </h4>
+            <div className="flex gap-2">
+              <button
+                onClick={fetchTechnicalFeedback}
+                className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs transition-colors"
+              >
+                Refresh
+              </button>
+              <button
+                onClick={() => setShowTechnicalModal(true)}
+                className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm transition-colors"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+
+          {technicalLoading ? (
+            <div className="animate-pulse space-y-3">
+              <div className="h-4 bg-white/20 rounded w-3/4"></div>
+              <div className="h-4 bg-white/20 rounded w-1/2"></div>
+              <div className="h-4 bg-white/20 rounded w-2/3"></div>
+            </div>
+          ) : technicalFeedback.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-2">🔧</div>
+              <p className="text-white/70 text-sm">No technical reports yet</p>
+              <p className="text-white/50 text-xs mt-2">Debug: Array length = {technicalFeedback.length}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Debug info */}
+              <div className="text-xs text-white/50 mb-2">
+                Debug: Showing {technicalCurrentIndex + 1} of {technicalFeedback.length} reports
+              </div>
+              {/* Current Technical Feedback */}
+              <div className="bg-white/5 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-semibold text-sm">
+                      {technicalFeedback[technicalCurrentIndex]?.name?.charAt(0) || 'U'}
+                    </div>
+                    <div>
+                      <div className="font-medium text-white text-sm">{technicalFeedback[technicalCurrentIndex]?.name}</div>
+                      <div className="text-xs text-white/60">{technicalFeedback[technicalCurrentIndex]?.role}</div>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getSeverityColor(technicalFeedback[technicalCurrentIndex]?.severity)}`}>
+                    {technicalFeedback[technicalCurrentIndex]?.severity}
+                  </span>
+                </div>
+                
+                <div className="space-y-2">
+                  {technicalFeedback[technicalCurrentIndex]?.issues && (
+                    <div className="text-xs">
+                      <span className="text-red-400 font-medium">Issues:</span>
+                      <span className="text-white/80 ml-1">{truncateText(technicalFeedback[technicalCurrentIndex].issues, 60)}</span>
+                    </div>
+                  )}
+                  {technicalFeedback[technicalCurrentIndex]?.featureRequest && (
+                    <div className="text-xs">
+                      <span className="text-blue-400 font-medium">Feature:</span>
+                      <span className="text-white/80 ml-1">{truncateText(technicalFeedback[technicalCurrentIndex].featureRequest, 60)}</span>
+                    </div>
+                  )}
+                  {technicalFeedback[technicalCurrentIndex]?.generalFeedback && (
+                    <div className="text-xs">
+                      <span className="text-green-400 font-medium">General:</span>
+                      <span className="text-white/80 ml-1">{truncateText(technicalFeedback[technicalCurrentIndex].generalFeedback, 60)}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <button
+                  onClick={() => {
+                    setSelectedTechnicalFeedback(technicalFeedback[technicalCurrentIndex]);
+                    setShowTechnicalDetailModal(true);
+                  }}
+                  className="mt-2 text-purple-400 hover:text-purple-300 text-xs underline"
+                >
+                  View Full Report
+                </button>
+              </div>
+
+              {/* Navigation dots */}
+              {technicalFeedback.length > 1 && (
+                <div className="flex justify-center gap-1">
+                  {technicalFeedback.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setTechnicalCurrentIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === technicalCurrentIndex ? 'bg-white' : 'bg-white/30'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-      <div className="flex items-center justify-between gap-3 text-white/70 text-sm">
-        <div>Have feedback for us?</div>
-        <a href="#" className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white border border-white/10">Share Feedback</a>
-      </div>
+
+      {/* Modals */}
+      <QuickFeedbackModal
+        isOpen={showQuickModal}
+        onClose={() => setShowQuickModal(false)}
+        onFeedbackSubmitted={handleQuickFeedbackSubmitted}
+      />
+
+      <TechnicalReportModal
+        isOpen={showTechnicalModal}
+        onClose={() => setShowTechnicalModal(false)}
+        onReportSubmitted={handleTechnicalFeedbackSubmitted}
+      />
+
+      <QuickFeedbackDetailModal
+        isOpen={showQuickDetailModal}
+        onClose={() => setShowQuickDetailModal(false)}
+        feedback={selectedQuickFeedback}
+      />
+
+      <TechnicalReportDetailModal
+        isOpen={showTechnicalDetailModal}
+        onClose={() => setShowTechnicalDetailModal(false)}
+        report={selectedTechnicalFeedback}
+      />
     </section>
   )
 }
@@ -459,7 +830,7 @@ export function CareerSection() {
 
 export function FooterSection() {
   return (
-    <footer className="glass-card p-8 text-white section-wrap">
+    <footer className="glass-card p-8 text-white section-wrap hover-glow hover-raise">
       <div className="grid md:grid-cols-4 gap-8">
         <div className="space-y-3">
           <div className="text-xl font-semibold">GL PeerBajaj</div>

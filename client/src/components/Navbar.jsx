@@ -5,12 +5,14 @@ import { useSocket } from '../context/SocketContext.jsx'
 import api from '../lib/api.js'
 import { useTheme } from '../context/ThemeContext.jsx'
 import Notifications from './Notifications.jsx'
+import NotificationDropdown from './NotificationDropdown.jsx'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
   const { socket } = useSocket()
   const { theme, toggleTheme } = useTheme()
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showNotificationDropdown, setShowNotificationDropdown] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
   const [unreadChatCount, setUnreadChatCount] = useState(0)
 
@@ -53,7 +55,13 @@ export default function Navbar() {
   return (
     <header className="backdrop-blur bg-slate-900/70 border-b border-white/10 sticky top-0 z-40">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="font-bold text-xl text-white">GL PeerBajaj</Link>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/logo-compact.svg" 
+            alt="GL PeerBajaj" 
+            className="h-8 w-auto"
+          />
+        </Link>
         
         <nav className="flex items-center gap-6 text-white">
           <NavLink 
@@ -140,20 +148,27 @@ export default function Navbar() {
                 )}
               </Link>
 
-              <button
-                onClick={() => setShowNotifications(true)}
-                className="relative flex items-center space-x-1 text-white/80 hover:text-blue-400 transition-base"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM4 7h6V5H4v2zM4 13h6v-2H4v2z" />
-                </svg>
-                <span>Notifications</span>
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotificationDropdown(!showNotificationDropdown)}
+                  className="relative flex items-center space-x-1 text-white/80 hover:text-blue-400 transition-base"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-2H4v2zM4 7h6V5H4v2zM4 13h6v-2H4v2z" />
+                  </svg>
+                  <span>Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                
+                <NotificationDropdown 
+                  isOpen={showNotificationDropdown}
+                  onClose={() => setShowNotificationDropdown(false)}
+                />
+              </div>
 
               <NavLink 
                 to={`/profile/${user._id}`} 

@@ -1,25 +1,24 @@
-import { Router } from 'express';
-import { authRequired } from '../middleware/auth.js';
-import {
-  getUserNotifications,
-  markNotificationsAsRead,
-  markNotificationAsRead,
-  deleteNotification,
-  deleteAllNotifications,
-  getUnreadCount
+import express from 'express';
+import { 
+  getNotifications, 
+  markNotificationAsRead, 
+  markAllAsRead, 
+  getUnreadCount 
 } from '../controllers/notification.controller.js';
+import { authRequired } from '../middleware/auth.js';
 
-const router = Router();
+const router = express.Router();
 
-// All notification routes require authentication
-router.use(authRequired);
+// Get user notifications
+router.get('/', authRequired, getNotifications);
 
-// Notification management
-router.get('/', getUserNotifications);
-router.get('/unread-count', getUnreadCount);
-router.put('/mark-read', markNotificationsAsRead);
-router.put('/:id/read', markNotificationAsRead);
-router.delete('/:id', deleteNotification);
-router.delete('/', deleteAllNotifications);
+// Get unread count
+router.get('/unread-count', authRequired, getUnreadCount);
+
+// Mark notification as read
+router.patch('/:id/read', authRequired, markNotificationAsRead);
+
+// Mark all notifications as read
+router.patch('/mark-all-read', authRequired, markAllAsRead);
 
 export default router;

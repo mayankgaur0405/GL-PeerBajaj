@@ -9,6 +9,7 @@ import Trending from './pages/Trending.jsx';
 import Chat from './pages/Chat.jsx';
 import Team from './pages/Team.jsx';
 import Guide from './pages/Guide.jsx';
+import PostDetail from './pages/PostDetail.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
@@ -54,6 +55,10 @@ export default function App() {
                   </PrivateRoute>
                 }
               />
+              {/* Post detail routes */}
+              <Route path="/roadmap/:id" element={<PostDetail />} />
+              <Route path="/blog/:id" element={<PostDetail />} />
+              <Route path="/image/:id" element={<PostDetail />} />
               {/* Optional: Catch-all route */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

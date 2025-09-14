@@ -113,12 +113,13 @@ export function setupSocketHandlers(io) {
 
         // Create notification for new message
         await Notification.createNotification({
-          recipient: otherParticipant,
-          sender: socket.userId,
+          receiverId: otherParticipant,
+          senderId: socket.userId,
           type: 'chat',
-          title: 'New Message',
-          message: content.length > 50 ? content.substring(0, 50) + '...' : content,
-          chat: chat._id
+          chatId: chat._id,
+          metadata: {
+            message: content.length > 50 ? content.substring(0, 50) + '...' : content
+          }
         });
 
         // Populate the message data

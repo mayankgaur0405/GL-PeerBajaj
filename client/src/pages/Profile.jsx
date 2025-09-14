@@ -4,6 +4,8 @@ import api from '../lib/api.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import Feed from '../components/Feed.jsx'
 import ProfilePictureUpload from '../components/ProfilePictureUpload.jsx'
+import FollowersList from '../components/FollowersList.jsx'
+import FollowingList from '../components/FollowingList.jsx'
 
 export default function Profile() {
   const { id } = useParams()
@@ -15,8 +17,9 @@ export default function Profile() {
   const [editProfile, setEditProfile] = useState({})
   const { user, setUser } = useAuth()
 
-  // Tabs for categorized posts on profile (keep hooks before any early returns)
-  const [activeTab, setActiveTab] = useState('section')
+  // Tabs for profile sections (keep hooks before any early returns)
+  const [activeTab, setActiveTab] = useState('posts')
+  const [activePostTab, setActivePostTab] = useState('section')
   const filtersByTab = useMemo(() => ({
     section: { type: 'section' },
     text: { type: 'text' },
@@ -241,14 +244,13 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Categorized Posts */}
+      {/* Profile Tabs */}
       <div className="glass-card p-6 space-y-4">
-        <h2 className="text-lg font-semibold">Posts</h2>
         <div className="tab-group w-full md:w-auto">
           {[
-            { key: 'section', label: 'Sections/Roadmaps' },
-            { key: 'text', label: 'Blogs/Text' },
-            { key: 'image', label: 'Images' }
+            { key: 'posts', label: 'Posts' },
+            { key: 'followers', label: `Followers (${profile.followers?.length || 0})` },
+            { key: 'following', label: `Following (${profile.following?.length || 0})` }
           ].map(t => (
             <button
               key={t.key}
@@ -259,7 +261,41 @@ export default function Profile() {
             </button>
           ))}
         </div>
-        <Feed type="user" userId={profile._id} filters={filtersByTab[activeTab]} />
+
+        {/* Tab Content */}
+        {activeTab === 'posts' && (
+          <div className="space-y-4">
+            <div className="tab-group w-full md:w-auto">
+              {[
+                { key: 'section', label: 'Sections/Roadmaps' },
+                { key: 'text', label: 'Blogs/Text' },
+                { key: 'image', label: 'Images' }
+              ].map(t => (
+                <button
+                  key={t.key}
+                  onClick={() => setActivePostTab(t.key)}
+                  className={`tab-btn ${activePostTab === t.key ? 'tab-btn-active' : ''}`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+            <Feed 
+              key={`${profile._id}-${activePostTab}`}
+              type="user" 
+              userId={profile._id} 
+              filters={filtersByTab[activePostTab]} 
+            />
+          </div>
+        )}
+
+        {activeTab === 'followers' && (
+          <FollowersList userId={profile._id} isOwnProfile={isOwnProfile} />
+        )}
+
+        {activeTab === 'following' && (
+          <FollowingList userId={profile._id} isOwnProfile={isOwnProfile} />
+        )}
       </div>
     </div>
   )

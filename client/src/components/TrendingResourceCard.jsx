@@ -7,7 +7,7 @@ export default function TrendingResourceCard({ item }) {
   const saves = Math.floor(Math.random() * 150) + 10
   
   return (
-    <div className="glass-card p-4 transition transform hover:scale-[1.01] hover:shadow-xl">
+    <div className="glass-card p-4 hover-glow hover-raise">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0 flex-1">
           <h4 className="text-white font-semibold truncate">{item.title}</h4>

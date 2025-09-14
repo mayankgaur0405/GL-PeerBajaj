@@ -35,10 +35,39 @@ export async function createPost(req, res, next) {
     // Update user's post count
     await User.findByIdAndUpdate(req.userId, { $inc: { totalPosts: 1 } });
     
+    // Create notifications for followers
+    const author = await User.findById(req.userId);
+    if (author.followers && author.followers.length > 0) {
+      const notifications = author.followers.map(followerId => ({
+        senderId: req.userId,
+        receiverId: followerId,
+        type: 'new_post',
+        postId: post._id
+      }));
+      
+      await Notification.insertMany(notifications);
+      
+      // Emit socket events for real-time notifications
+      if (req.io) {
+        author.followers.forEach(followerId => {
+          req.io.emitToUser(followerId, 'new_notification', {
+            type: 'new_post',
+            senderId: req.userId,
+            senderName: author.name,
+            postId: post._id
+          });
+        });
+      }
+    }
+    
     // Populate author data
     await post.populate('author', 'name username profilePicture');
     
-    res.status(201).json({ post });
+    res.status(201).json({ 
+      post,
+      postId: post._id,
+      postType: post.type
+    });
   } catch (err) {
     next(err);
   }

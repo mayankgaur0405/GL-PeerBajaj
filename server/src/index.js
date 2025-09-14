@@ -13,10 +13,19 @@ import chatRoutes from "./routes/chat.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import trendingRoutes from "./routes/trending.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import followRoutes from "./routes/follow.routes.js";
+import feedRoutes from "./routes/feed.routes.js";
+import feedbackRoutes from "./routes/feedback.routes.js";
 import { notFoundHandler, errorHandler } from "./middleware/error.js";
 import { setupSocketHandlers } from "./lib/socket.js";
 
-dotenv.config();
+// Load environment variables
+dotenv.config({ path: './.env' });
+console.log('Environment variables loaded:', {
+  NODE_ENV: process.env.NODE_ENV,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? 'SET' : 'NOT SET',
+  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET ? 'SET' : 'NOT SET'
+});
 
 const app = express();
 const server = createServer(app);
@@ -84,6 +93,9 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/trending", trendingRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/follow", followRoutes);
+app.use("/api/feed", feedRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 // Error handlers
 app.use(notFoundHandler);

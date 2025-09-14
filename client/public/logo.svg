@@ -1,0 +1,69 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- GLP Block Logo -->
+  <g transform="translate(20, 10)">
+    <!-- Letter G blocks -->
+    <rect x="0" y="0" width="12" height="12" fill="#8B5CF6"/>
+    <rect x="12" y="0" width="12" height="12" fill="#7C3AED"/>
+    <rect x="24" y="0" width="12" height="12" fill="#6D28D9"/>
+    <rect x="0" y="12" width="12" height="12" fill="#8B5CF6"/>
+    <rect x="0" y="24" width="12" height="12" fill="#8B5CF6"/>
+    <rect x="0" y="36" width="12" height="12" fill="#8B5CF6"/>
+    <rect x="12" y="36" width="12" height="12" fill="#7C3AED"/>
+    <rect x="24" y="36" width="12" height="12" fill="#6D28D9"/>
+    <rect x="24" y="24" width="12" height="12" fill="#6D28D9"/>
+    <rect x="24" y="12" width="12" height="12" fill="#6D28D9"/>
+    
+    <!-- Letter L blocks -->
+    <rect x="48" y="0" width="12" height="12" fill="#5B21B6"/>
+    <rect x="60" y="0" width="12" height="12" fill="#4C1D95"/>
+    <rect x="72" y="0" width="12" height="12" fill="#3B82F6"/>
+    <rect x="48" y="12" width="12" height="12" fill="#5B21B6"/>
+    <rect x="48" y="24" width="12" height="12" fill="#5B21B6"/>
+    <rect x="48" y="36" width="12" height="12" fill="#5B21B6"/>
+    <rect x="60" y="36" width="12" height="12" fill="#4C1D95"/>
+    <rect x="72" y="36" width="12" height="12" fill="#3B82F6"/>
+    
+    <!-- Letter P blocks -->
+    <rect x="96" y="0" width="12" height="12" fill="#0EA5E9"/>
+    <rect x="108" y="0" width="12" height="12" fill="#0284C7"/>
+    <rect x="120" y="0" width="12" height="12" fill="#0369A1"/>
+    <rect x="96" y="12" width="12" height="12" fill="#0EA5E9"/>
+    <rect x="96" y="24" width="12" height="12" fill="#0EA5E9"/>
+    <rect x="96" y="36" width="12" height="12" fill="#0EA5E9"/>
+    <rect x="108" y="12" width="12" height="12" fill="#0284C7"/>
+    <rect x="120" y="12" width="12" height="12" fill="#0369A1"/>
+    <rect x="108" y="24" width="12" height="12" fill="#0284C7"/>
+    <rect x="120" y="24" width="12" height="12" fill="#0369A1"/>
+    
+    <!-- Connecting lines and nodes -->
+    <line x1="6" y1="48" x2="6" y2="54" stroke="url(#lineGradient)" stroke-width="2"/>
+    <circle cx="6" cy="54" r="3" fill="#8B5CF6"/>
+    <line x1="6" y1="54" x2="12" y2="60" stroke="url(#lineGradient)" stroke-width="2"/>
+    <circle cx="12" cy="60" r="3" fill="#0EA5E9"/>
+    <line x1="12" y1="60" x2="60" y2="48" stroke="url(#lineGradient)" stroke-width="2"/>
+    <circle cx="60" cy="48" r="3" fill="#0EA5E9"/>
+    <line x1="60" y1="48" x2="78" y2="48" stroke="url(#lineGradient)" stroke-width="2"/>
+    <circle cx="78" cy="48" r="3" fill="#0EA5E9"/>
+    
+    <!-- Small trailing pixels -->
+    <rect x="3" y="57" width="3" height="3" fill="#8B5CF6"/>
+    <rect x="6" y="60" width="3" height="3" fill="#8B5CF6"/>
+    <rect x="9" y="63" width="3" height="3" fill="#8B5CF6"/>
+    <rect x="9" y="63" width="3" height="3" fill="#0EA5E9"/>
+    <rect x="12" y="66" width="3" height="3" fill="#0EA5E9"/>
+    <rect x="15" y="69" width="3" height="3" fill="#0EA5E9"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="20" y="70" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">GL</text>
+  <text x="50" y="70" font-family="Arial, sans-serif" font-size="14" font-weight="400" fill="white">PeerBajaj</text>
+  
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0EA5E9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

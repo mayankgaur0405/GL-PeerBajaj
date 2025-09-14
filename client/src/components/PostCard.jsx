@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import api from '../lib/api.js';
 import EditPost from './EditPost.jsx';
 import DeleteConfirmation from './DeleteConfirmation.jsx';
+import FollowButton from './FollowButton.jsx';
 
-export default function PostCard({ post, onUpdate, showActions = true }) {
+export default function PostCard({ post, onUpdate, showActions = true, showFollowButton = false }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(post.likes?.some(like => like._id === user?._id) || false);
   const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
   const [commentsCount, setCommentsCount] = useState(post.comments?.length || 0);
@@ -25,6 +28,19 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const handlePostClick = () => {
+    const routeMap = {
+      'text': 'blog',
+      'section': 'roadmap',
+      'image': 'image'
+    };
+    
+    const routeType = routeMap[post.type];
+    if (routeType) {
+      navigate(`/${routeType}/${post._id}`);
+    }
   };
 
   const handleLike = async () => {
@@ -219,6 +235,12 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-white/60">{formatDate(post.createdAt)}</span>
+            {showFollowButton && !isOwnPost && (
+              <FollowButton 
+                userId={post.author?._id}
+                isFollowing={user?.following?.includes(post.author?._id)}
+              />
+            )}
             {isOwnPost && showActions && (
               <div className="flex items-center gap-1">
                 <button
@@ -245,7 +267,14 @@ export default function PostCard({ post, onUpdate, showActions = true }) {
         </div>
 
         {/* Post Title */}
-        {post.title && <h2 className="text-xl font-semibold text-white">{post.title}</h2>}
+        {post.title && (
+          <h2 
+            className="text-xl font-semibold text-white cursor-pointer hover:text-blue-400 transition-colors"
+            onClick={handlePostClick}
+          >
+            {post.title}
+          </h2>
+        )}
 
         {/* Post Content */}
         {renderPostContent()}

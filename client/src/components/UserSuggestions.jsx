@@ -77,7 +77,7 @@ export default function UserSuggestions() {
 
   if (suggestions.length === 0) {
     return (
-      <div className="glass-card p-6">
+      <div className="glass-card p-6 hover-glow hover-raise">
         <h3 className="text-white text-lg font-semibold mb-4">Suggested for you</h3>
         <p className="text-white/60 text-center py-4">No suggestions available</p>
       </div>
@@ -85,7 +85,7 @@ export default function UserSuggestions() {
   }
 
   return (
-    <div className="bg-white/10 border border-white/10 rounded-2xl p-6">
+    <div className="glass-card p-6 hover-glow hover-raise">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white text-lg font-semibold">Suggested for you</h3>
         <button onClick={handleShuffle} className="text-sm text-blue-400 hover:text-blue-300 font-medium">Shuffle</button>

@@ -107,7 +107,7 @@ export default function Home() {
           {activeTab === 'discover' ? (
             <>
               {/* Search Section */}
-              <div className="glass-card p-6">
+              <div className="glass-card p-6 hover-glow hover-raise">
                 <SearchBar value={query} onChange={setQuery} onSearch={handleSearch} />
                 <div className="mt-4">
                   <Filters filters={filters} setFilters={setFilters} onApply={handleSearch} />
@@ -171,7 +171,7 @@ export default function Home() {
           <UserSuggestions />
 
           {/* Quick Stats */}
-          <div className="glass-card p-6">
+          <div className="glass-card p-6 hover-glow hover-raise">
             <h3 className="text-lg font-semibold mb-4">Platform Stats</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -190,7 +190,7 @@ export default function Home() {
           </div>
 
           {/* Quick Links */}
-          <div className="glass-card p-6">
+          <div className="glass-card p-6 hover-glow hover-raise">
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <div className="space-y-2">
               <Link 

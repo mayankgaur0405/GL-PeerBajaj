@@ -123,12 +123,13 @@ export async function sendMessage(req, res, next) {
 
     // Create notification for new message
     await Notification.createNotification({
-      recipient: otherParticipant,
-      sender: req.userId,
+      receiverId: otherParticipant,
+      senderId: req.userId,
       type: 'chat',
-      title: 'New Message',
-      message: content.length > 50 ? content.substring(0, 50) + '...' : content,
-      chat: chat._id
+      chatId: chat._id,
+      metadata: {
+        message: content.length > 50 ? content.substring(0, 50) + '...' : content
+      }
     });
 
     // Populate the updated chat

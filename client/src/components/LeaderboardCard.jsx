@@ -10,7 +10,7 @@ export default function LeaderboardCard({ user, index }) {
   const shares = Math.floor(user.contributions * 0.1) || 0
   
   return (
-    <div className="glass-card p-4 transition transform hover:scale-[1.01] hover:shadow-xl">
+    <div className="glass-card p-4 hover-glow hover-raise">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <img 

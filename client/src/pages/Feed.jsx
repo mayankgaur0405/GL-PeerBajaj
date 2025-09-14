@@ -6,6 +6,7 @@ import UserSuggestions from '../components/UserSuggestions.jsx';
 
 export default function FeedPage() {
   const { user } = useAuth();
+  const [activeFeed, setActiveFeed] = useState('following');
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -28,8 +29,24 @@ export default function FeedPage() {
           {/* Create Post */}
           <CreatePost onPostCreated={handlePostCreated} />
 
-          {/* Filter Tabs */}
+          {/* Feed Type Tabs */}
           <div className="glass-card p-4">
+            <div className="tab-group mb-4">
+              {[
+                { key: 'following', label: 'Following Feed' },
+                { key: 'global', label: 'Global Feed' }
+              ].map(feed => (
+                <button
+                  key={feed.key}
+                  onClick={() => setActiveFeed(feed.key)}
+                  className={`tab-btn ${activeFeed === feed.key ? 'tab-btn-active' : ''}`}
+                >
+                  {feed.label}
+                </button>
+              ))}
+            </div>
+            
+            {/* Filter Tabs */}
             <div className="tab-group">
               {[
                 { key: 'all', label: 'All Posts' },
@@ -50,8 +67,8 @@ export default function FeedPage() {
 
           {/* Feed */}
           <Feed 
-            key={`${refreshKey}-${activeFilter}`}
-            type="feed" 
+            key={`${refreshKey}-${activeFeed}-${activeFilter}`}
+            type={activeFeed}
             filters={filters[activeFilter]}
           />
         </div>

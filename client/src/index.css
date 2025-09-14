@@ -19,9 +19,6 @@ html, body, #root { @apply bg-gray-50 text-gray-900 transition-colors; }
 }
 
 /* Glass helpers to ensure consistent look */
-.glass-card {
-  @apply bg-white/10 border border-white/10 rounded-2xl shadow-sm;
-}
 .glass-card-muted {
   @apply bg-white/5 border border-white/10 rounded-2xl shadow-sm;
 }
@@ -34,16 +31,21 @@ html, body, #root { @apply bg-gray-50 text-gray-900 transition-colors; }
 
 /* Enhanced card hovers */
 .hover-glow:hover {
-  box-shadow: 0 10px 30px rgba(59,130,246,.25), 0 0 0 1px rgba(59,130,246,.25) inset;
+  box-shadow: 0 10px 30px rgba(59,130,246,.25), 0 0 0 1px rgba(59,130,246,.25) inset !important;
 }
 .hover-raise:hover {
-  transform: translateY(-2px) scale(1.01);
+  transform: translateY(-5px) !important;
 }
 .hover-tilt:hover {
-  transform: translateY(-2px) rotate(-.25deg) scale(1.01);
+  transform: translateY(-5px) rotate(-.25deg) !important;
 }
 .hover-border-bright:hover {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+}
+
+/* Standardized card hover effects with smooth transitions */
+.glass-card {
+  @apply bg-white/10 border border-white/10 rounded-2xl shadow-sm transition-all duration-300 ease-out;
 }
 
 /* Gradient bands for section separation */

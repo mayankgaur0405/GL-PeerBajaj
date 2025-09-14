@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import api from '../lib/api.js';
 
 export default function CreatePost({ onPostCreated }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [postType, setPostType] = useState('text');
   const [formData, setFormData] = useState({
@@ -20,6 +22,7 @@ export default function CreatePost({ onPostCreated }) {
   });
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const categories = [
     'DSA', 'Web Dev', 'Mobile Dev', 'AI/ML', 'DevOps', 
@@ -47,7 +50,19 @@ export default function CreatePost({ onPostCreated }) {
         postData.images = formData.images;
       }
 
-      await api.post('/posts', postData);
+      const response = await api.post('/posts', postData);
+      const { postId, postType: createdPostType } = response.data;
+      
+      // Show success notification
+      const postTypeNames = {
+        'text': 'Blog post',
+        'section': 'Roadmap',
+        'image': 'Image post'
+      };
+      
+      // Show success notification
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
       
       // Reset form
       setFormData({
@@ -64,8 +79,30 @@ export default function CreatePost({ onPostCreated }) {
       });
       setIsOpen(false);
       
+      // Call the callback if provided
       if (onPostCreated) {
         onPostCreated();
+      }
+      
+      // Redirect to the newly created post's detail page
+      const routeMap = {
+        'text': 'blog',
+        'section': 'roadmap',
+        'image': 'image'
+      };
+      
+      const routeType = routeMap[createdPostType];
+      if (routeType && postId) {
+        setTimeout(() => {
+          navigate(`/${routeType}/${postId}`);
+        }, 1500); // 1.5 second delay to show success notification
+      } else {
+        // Fallback to profile page if route doesn't exist
+        if (user && user._id) {
+          setTimeout(() => {
+            navigate(`/profile/${user._id}`);
+          }, 1500);
+        }
       }
     } catch (err) {
       console.error('Failed to create post:', err);
@@ -166,37 +203,64 @@ export default function CreatePost({ onPostCreated }) {
 
   if (!isOpen) {
     return (
-      <div className="glass-card p-6">
-        <div className="flex items-center space-x-3">
-          <img 
-            src={user?.profilePicture || '/default-avatar.svg'} 
-            alt={user?.name}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <button
-            onClick={() => setIsOpen(true)}
-            className="flex-1 text-left bg-white/10 rounded-full px-4 py-2 text-white/60 hover:bg-white/20 transition-colors"
-          >
-            What's on your mind?
-          </button>
+      <>
+        {/* Success Notification */}
+        {showSuccess && (
+          <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fadeInUp">
+            <span className="text-xl">✅</span>
+            <span className="font-medium">
+              {postType === 'text' ? 'Blog post' : 
+               postType === 'section' ? 'Roadmap' : 
+               'Image post'} created successfully!
+            </span>
+          </div>
+        )}
+        
+        <div className="glass-card p-6">
+          <div className="flex items-center space-x-3">
+            <img 
+              src={user?.profilePicture || '/default-avatar.svg'} 
+              alt={user?.name}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+            <button
+              onClick={() => setIsOpen(true)}
+              className="flex-1 text-left bg-white/10 rounded-full px-4 py-2 text-white/60 hover:bg-white/20 transition-colors"
+            >
+              What's on your mind?
+            </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="glass-card p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Create Post</h2>
-        <button
-          onClick={() => setIsOpen(false)}
-          className="text-white/60 hover:text-white"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+    <>
+      {/* Success Notification */}
+      {showSuccess && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-fadeInUp">
+          <span className="text-xl">✅</span>
+          <span className="font-medium">
+            {postType === 'text' ? 'Blog post' : 
+             postType === 'section' ? 'Roadmap' : 
+             'Image post'} created successfully!
+          </span>
+        </div>
+      )}
+      
+      <div className="glass-card p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-white">Create Post</h2>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-white/60 hover:text-white"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Post Type Selection */}
@@ -433,6 +497,7 @@ export default function CreatePost({ onPostCreated }) {
           </button>
         </div>
       </form>
-    </div>
+      </div>
+    </>
   );
 }
