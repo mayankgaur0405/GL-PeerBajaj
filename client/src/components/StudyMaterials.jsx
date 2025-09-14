@@ -18,11 +18,21 @@ export default function StudyMaterials() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="section-header">
+    <div className="space-y-8">
+      {/* Main Heading */}
+      <div className="section-header text-center">
         <span className="section-badge">🏫</span>
-        <h2 className="text-2xl font-bold text-white">Preparation Resources By GL PeerBajaj</h2>
+        <h2 className="text-3xl font-bold text-white">
+          Resources By GL PeerBajaj
+        </h2>
       </div>
+
+      {/* Subheading */}
+      <h3 className="text-xl font-semibold text-white/90 border-b border-white/20 pb-2">
+        Academics Preparation
+      </h3>
+
+      {/* Academic Study Plan */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
         {studyPlan.map((y) => (
           <div key={y.year} className="space-y-3">
@@ -55,8 +65,7 @@ export default function StudyMaterials() {
         ))}
       </div>
 
-      {/* Removed Placements Preparation */}
-
+      {/* Modal for Semester Subjects */}
       <Modal
         open={open}
         onClose={() => setOpen(false)}

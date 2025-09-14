@@ -96,6 +96,7 @@ export function PlacementPrepSection() {
   )
 }
 
+
 export function HeroSection() {
   return (
     <section className="min-h-screen flex items-center justify-center text-center relative overflow-hidden">
