@@ -491,6 +491,7 @@ export function FooterSection() {
           <ul className="space-y-2 text-white/80 text-sm">
             <li><a href="/trending" className="hover:text-white">Trending</a></li>
             <li><a href="/feed" className="hover:text-white">Your Feed</a></li>
+            <li><a href="/team" className="hover:text-white">Our Team</a></li>
             <li><a href="#" className="hover:text-white">Guides</a></li>
             <li><a href="#" className="hover:text-white">Study Materials</a></li>
             <li><a href="#" className="hover:text-white">Placement Prep</a></li>

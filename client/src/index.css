@@ -87,6 +87,10 @@ html, body, #root { @apply bg-gray-50 text-gray-900 transition-colors; }
 /* Keyframes for subtle animations */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
 @keyframes fadeIn { from { opacity: 0;} to { opacity: 1;} }
+@keyframes slideInFromLeft { from { opacity: 0; transform: translateX(-30px);} to { opacity: 1; transform: translateX(0);} }
+@keyframes slideInFromRight { from { opacity: 0; transform: translateX(30px);} to { opacity: 1; transform: translateX(0);} }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.9);} to { opacity: 1; transform: scale(1);} }
+@keyframes bounce { 0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); } 40%, 43% { transform: translate3d(0, -8px, 0); } 70% { transform: translate3d(0, -4px, 0); } 90% { transform: translate3d(0, -2px, 0); } }
 
 /* Section separators */
 .section-wrap {
@@ -97,6 +101,160 @@ html, body, #root { @apply bg-gray-50 text-gray-900 transition-colors; }
 }
 .section-badge {
   @apply inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/10 text-white/70;
+}
+
+/* Team page specific styles */
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-slideInFromLeft {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.animate-slideInFromRight {
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.4s ease-out forwards;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Line clamp utility for text truncation */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Enhanced hover effects for team cards */
+.team-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.team-card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Responsive grid improvements */
+@media (max-width: 640px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .team-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Team card uniformity utilities */
+.team-card {
+  min-height: 480px; /* Ensure minimum height for consistency */
+}
+
+@media (max-width: 640px) {
+  .team-card {
+    min-height: 420px; /* Slightly smaller on mobile */
+  }
+}
+
+/* Ensure consistent card heights in grid */
+.team-grid .team-card {
+  height: 100%;
+}
+
+/* Line clamp utilities for better text handling */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Flex utilities for consistent spacing */
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+/* Ensure social icons don't wrap */
+.social-icons-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.75rem;
+}
+
+/* Skills container with better overflow handling */
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  max-height: 2rem;
+  overflow: hidden;
+}
+
+/* Responsive text sizing for team cards */
+@media (max-width: 640px) {
+  .team-card h3 {
+    font-size: 1.125rem; /* text-lg */
+  }
+  
+  .team-card .designation {
+    font-size: 0.875rem; /* text-sm */
+  }
+  
+  .team-card .bio {
+    font-size: 0.75rem; /* text-xs */
+  }
+}
+
+@media (min-width: 641px) {
+  .team-card h3 {
+    font-size: 1.25rem; /* text-xl */
+  }
+  
+  .team-card .designation {
+    font-size: 0.875rem; /* text-sm */
+  }
+  
+  .team-card .bio {
+    font-size: 0.875rem; /* text-sm */
+  }
 }
 
 /* end theme overrides */
