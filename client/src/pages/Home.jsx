@@ -36,18 +36,20 @@ export default function Home() {
 
   useEffect(() => {
     loadSuggestions()
-    // Load contributors from backend
-    ;(async () => {
-      try {
-        const res = await apiClient.get('/trending/contributors?limit=6')
-        if (res.data?.contributors?.length) setContributors(res.data.contributors.map(c => ({
-          name: c.name,
-          contributions: c.contributions,
-          avatar: c.avatar,
-          max: 150
-        })))
-      } catch (_) {}
-    })()
+      ; (async () => {
+        try {
+          const res = await apiClient.get('/trending/contributors?limit=6')
+          if (res.data?.contributors?.length)
+            setContributors(
+              res.data.contributors.map(c => ({
+                name: c.name,
+                contributions: c.contributions,
+                avatar: c.avatar,
+                max: 150
+              }))
+            )
+        } catch (_) { }
+      })()
   }, [])
 
   const handleSearch = async () => {
@@ -73,42 +75,44 @@ export default function Home() {
 
   return (
     <div className="snap-y snap-mandatory">
-      {/* Fullscreen Hero with enhanced spacing */}
+      {/* Fullscreen Hero with same container width */}
       <div className="snap-start relative">
-        <HeroSection />
-        {/* Decorative bottom border */}
+        <div className="max-w-6xl mx-auto px-4">
+          <HeroSection />
+        </div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
       </div>
 
       {/* Tabs */}
-      <div className="glass-card p-4 mb-6">
-        <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
-          {[
-            { key: 'discover', label: 'Discover People' },
-            { key: 'feed', label: 'Recent Posts' }
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
-                activeTab === tab.key
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="glass-card p-4 mb-6">
+          <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+            {[
+              { key: 'discover', label: 'Discover People' },
+              { key: 'feed', label: 'Recent Posts' }
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${activeTab === tab.key
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8 snap-start">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
+      {/* Main two-column layout */}
+      <div className="max-w-6xl mx-auto px-4 py-8 snap-start grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left aligned content */}
         <div className="lg:col-span-2 space-y-6">
           {activeTab === 'discover' ? (
             <>
-              {/* Search Section */}
+              {/* Search + Filters */}
               <div className="glass-card p-6 hover-glow hover-raise">
                 <SearchBar value={query} onChange={setQuery} onSearch={handleSearch} />
                 <div className="mt-4">
@@ -116,7 +120,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* When searching or filtering → show dynamic user results. Otherwise → show hybrid section */}
+              {/* Dynamic search results or contributors/resources */}
               {hasSearch ? (
                 <div>
                   <h2 className="text-xl font-semibold mb-4">Search Results</h2>
@@ -133,7 +137,7 @@ export default function Home() {
                     </div>
                   ) : (
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                      {users.map((u) => (
+                      {users.map(u => (
                         <ProfileCard key={u._id} user={u} />
                       ))}
                     </div>
@@ -145,8 +149,8 @@ export default function Home() {
                     <CardGrid
                       title="Top Contributors"
                       subtitle="Recognizing active community members"
-                      items={contributors}
-                      renderItem={(u, idx) => (<LeaderboardCard user={u} index={idx} />)}
+                      items={contributors.slice(0, 3)}   // 👈 show only top 3
+                      renderItem={(u, idx) => <LeaderboardCard user={u} index={idx} />}
                       cols="grid"
                     />
                   </div>
@@ -154,12 +158,13 @@ export default function Home() {
                     <CardGrid
                       title="Trending Resources"
                       subtitle="Popular PDFs, playlists and notes"
-                      items={trendingResources}
-                      renderItem={(it) => (<TrendingResourceCard item={it} />)}
+                      items={trendingResources.slice(0, 3)}   // 👈 show only top 3
+                      renderItem={it => <TrendingResourceCard item={it} />}
                       cols="grid"
                     />
                   </div>
                 </div>
+
               )}
             </>
           ) : (
@@ -167,12 +172,10 @@ export default function Home() {
           )}
         </div>
 
-        {/* Sidebar */}
+        {/* Right aligned sidebar */}
         <div className="space-y-6">
-          {/* User Suggestions */}
           <UserSuggestions />
 
-          {/* Quick Stats */}
           <div className="glass-card p-6 hover-glow hover-raise">
             <h3 className="text-lg font-semibold mb-4">Platform Stats</h3>
             <div className="space-y-3">
@@ -191,32 +194,31 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div className="glass-card p-6 hover-glow hover-raise">
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <div className="space-y-2">
-              <Link 
-                to="/trending" 
+              <Link
+                to="/trending"
                 className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 🔥 Trending Content
               </Link>
               {user && (
                 <>
-                  <Link 
-                    to="/feed" 
+                  <Link
+                    to="/feed"
                     className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                   >
                     📱 Your Feed
                   </Link>
-                  <Link 
-                    to="/chat" 
+                  <Link
+                    to="/chat"
                     className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                   >
                     💬 Messages
                   </Link>
-                  <Link 
-                    to={`/profile/${user._id}`} 
+                  <Link
+                    to={`/profile/${user._id}`}
                     className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
                   >
                     ⚙️ Profile
@@ -226,24 +228,21 @@ export default function Home() {
             </div>
           </div>
         </div>
-        </div>
       </div>
+
       {/* Study Materials & Ordered Sections */}
       <div className="mt-10 space-y-10 snap-start">
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-1">
           <div className="rounded-2xl p-6 bg-slate-900 space-y-8">
-            {/* Semester Prep */}
             <StudyMaterials />
-            {/* Placement Prep moved here */}
             <PlacementPrepSection />
           </div>
         </div>
 
-        {/* Independent sections below */}
         <div className="snap-start"><AboutSection /></div>
+        <div className="snap-start"><PlatformFeaturesSection /></div>
         <div className="snap-start"><BenefitsSection /></div>
         <div className="snap-start"><InternshipSection /></div>
-        <div className="snap-start"><PlatformFeaturesSection /></div>
         <div className="snap-start"><CareerSection /></div>
         <div className="snap-start"><FeedbackSection /></div>
         <div className="snap-start"><FooterSection /></div>
@@ -253,8 +252,6 @@ export default function Home() {
 }
 
 function intersectById(a, b) {
-  const ids = new Set(a.map((x) => x._id))
-  return b.filter((x) => ids.has(x._id))
+  const ids = new Set(a.map(x => x._id))
+  return b.filter(x => ids.has(x._id))
 }
-
-

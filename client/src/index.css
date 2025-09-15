@@ -126,6 +126,15 @@
   animation: float 3s ease-in-out infinite;
 }
 
+/* Slower float variants for subtle background/parallax elements */
+.animate-float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float 10s ease-in-out infinite;
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
@@ -190,6 +199,8 @@
   .animate-zoom-in,
   .animate-fadeIn,
   .animate-float,
+  .animate-float-slow,
+  .animate-float-slower,
   .animate-pulse-glow,
   .animate-gradient-shift {
     animation: none;

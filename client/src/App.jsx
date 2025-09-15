@@ -11,6 +11,10 @@ import Team from './pages/Team.jsx';
 import Guide from './pages/Guide.jsx';
 import PostDetail from './pages/PostDetail.jsx';
 import Editor from './pages/Editor.jsx';
+import Sitemap from './pages/Sitemap.jsx';
+import Privacy from './pages/Privacy.jsx';
+import Terms from './pages/Terms.jsx';
+import Contact from './pages/Contact.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
@@ -36,6 +40,11 @@ export default function App() {
               <main className="container mx-auto px-4 py-6 flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
+              
+              <Route path="/sitemap" element={<Sitemap />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/profile/:id" element={<Profile />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />

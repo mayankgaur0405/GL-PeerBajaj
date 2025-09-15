@@ -1,6 +1,7 @@
 import Modal from './Modal.jsx'
 import ResourceList from './ResourceList.jsx'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext.jsx'
 import api from '../lib/api.js'
 import FeedbackModal from './FeedbackModal.jsx'
@@ -10,6 +11,7 @@ import QuickFeedbackModal from './QuickFeedbackModal.jsx'
 import TechnicalReportModal from './TechnicalReportModal.jsx'
 import QuickFeedbackDetailModal from './QuickFeedbackDetailModal.jsx'
 import TechnicalReportDetailModal from './TechnicalReportDetailModal.jsx'
+import { Link } from 'react-router-dom'
 
 const placementResources = {
   'DSA': {
@@ -224,12 +226,15 @@ export function HeroSection() {
             <span className="text-xl group-hover:scale-110 transition-transform duration-300">💼</span>
           </a>
           
-          {/* Scroll indicator positioned after LinkedIn */}
-          <div className="animate-bounce">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
-            </div>
-          </div>
+          {/* Call to action: Post to Feed */}
+          <Link 
+            to="/feed"
+            className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-white/20 text-white/90 hover:text-white hover:from-emerald-500/30 hover:to-cyan-500/30 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 animate-pulse-glow"
+            title="Post to the Feed"
+          >
+            <span className="text-lg">📝</span>
+            <span className="font-semibold">Post</span>
+          </Link>
           
           <a 
             href="mailto:glpeerbajaj@gmail.com" 
@@ -251,41 +256,37 @@ export function HeroSection() {
 
 export function AboutSection() {
   return (
-    <div id="about" className="glass-card p-6 text-white section-wrap hover-glow hover-raise">
+    <div id="about" className="space-y-3 section-wrap">
       <div className="section-header">
         <span className="section-badge">ℹ️</span>
-        <h3 className="text-xl font-semibold">About GL PeerBajaj</h3>
+        <h3 className="text-white font-semibold">About GL PeerBajaj</h3>
       </div>
-      <div className="space-y-4 text-white/80">
-        <p>
-          GL PeerBajaj is a community‑driven learning platform that helps students quickly find reliable study materials,
-          prepare for placements, and grow with peer support. We organize cluttered content into clear roadmaps so you can
-          focus on practice over searching.
-        </p>
-        <div className="grid sm:grid-cols-3 gap-3">
-          <div className="glass-card px-4 py-3 text-center hover-glow hover-raise">
-            <div className="text-2xl">📚</div>
-            <div className="font-semibold text-white">Curated Content</div>
-            <div className="text-xs text-white/70">Notes, PDFs, and playlists</div>
+      <div className="grid md:grid-cols-3 gap-4 stagger">
+        <div className="glass-card p-6 text-white hover-glow hover-raise">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-blue-500/30">🎯</span>
+            <div className="text-lg font-semibold">Our Mission</div>
           </div>
-          <div className="glass-card px-4 py-3 text-center hover-glow hover-raise">
-            <div className="text-2xl">🤝</div>
-            <div className="font-semibold text-white">Peer Community</div>
-            <div className="text-xs text-white/70">Learn together, faster</div>
-          </div>
-          <div className="glass-card px-4 py-3 text-center hover-glow hover-raise">
-            <div className="text-2xl">🎯</div>
-            <div className="font-semibold text-white">Placement Focus</div>
-            <div className="text-xs text-white/70">Structured interview prep</div>
-          </div>
+          <p className="text-white/80 text-sm">Make learning simpler and faster with curated resources, peer support, and a focused environment for B.Tech students.</p>
         </div>
-        <ul className="list-disc pl-5 space-y-1">
-          <li>Smart feed surfaces high‑value materials first</li>
-          <li>Clean, modern UI with light/dark themes</li>
-          <li>Messaging and notifications to stay on track</li>
-          <li>Built with feedback from students and mentors</li>
-        </ul>
+
+        <div className="glass-card p-6 text-white hover-glow hover-raise">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-emerald-500/30">🧩</span>
+            <div className="text-lg font-semibold">What You Get</div>
+          </div>
+          <p className="text-white/80 text-sm">Structured study materials, trending resources, and real‑time chat to learn with friends and seniors.</p>
+        </div>
+
+        <div className="glass-card p-6 text-white hover-glow hover-raise">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-purple-500/30">🚀</span>
+            <div className="text-lg font-semibold">How It Works</div>
+          </div>
+          <p className="text-white/80 text-sm">Browse guides, follow roadmaps, ask for help, and share your progress to stay consistent.</p>
+        </div>
       </div>
+      
     </div>
   )
 }
@@ -396,59 +397,175 @@ export function InternshipSection() {
 }
 
 export function PlatformFeaturesSection() {
+  const [cursor, setCursor] = useState({ x: -9999, y: -9999 })
+  const containerRef = useRef(null)
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  }
+
+  const handleMouseMove = (e) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setCursor({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+  }
+
   return (
-    <div id="features" className="space-y-3 section-wrap">
-      <div className="section-header">
+    <div
+      id="features"
+      className="space-y-3 section-wrap relative overflow-hidden"
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Animated gradient background */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-900/40 via-sky-900/30 to-emerald-900/40 animate-gradient-shift" />
+
+      {/* Floating parallax icons */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute top-6 left-8 text-white/10 animate-float-slow">{`</>`}</div>
+        <div className="absolute bottom-8 right-10 text-white/10 animate-float-slower">🤖</div>
+        <div className="absolute top-1/3 right-1/4 text-white/10 animate-float-slow">📄</div>
+        <div className="absolute bottom-1/4 left-16 text-white/10 animate-float-slower">🗓️</div>
+      </div>
+
+      {/* Cursor spotlight */}
+      <div
+        className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl bg-cyan-400/10 border border-cyan-300/10 w-40 h-40"
+        style={{ left: cursor.x, top: cursor.y }}
+      />
+
+      <div className="section-header relative z-10">
         <span className="section-badge">⚙️</span>
         <h3 className="text-white font-semibold">Platform Features</h3>
       </div>
-      <div className="grid md:grid-cols-3 gap-4 stagger">
-        <div className="glass-card p-6 text-white hover-glow hover-raise">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-sky-500/30">💬</span>
-            <div className="text-lg font-semibold">Real‑time Chat</div>
+      <motion.div
+        className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 stagger relative z-10"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ staggerChildren: 0.12 }}
+      >
+        {/* Realtime Code Editor */}
+        <motion.a href="/editor/demo" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(56,189,248,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-blue-500/30">🧑‍💻</span>
+              <div className="text-lg font-semibold">Realtime Code Editor</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Try Now</span>
           </div>
-          <p className="text-white/80 text-sm">Discuss doubts instantly with seniors and friends. Private groups and DMs make collaboration smooth during late‑night study sessions.</p>
-        </div>
-        <div className="glass-card p-6 text-white hover-glow hover-raise">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-amber-500/30">🧠</span>
-            <div className="text-lg font-semibold">Smart Feed</div>
+          <p className="text-white/80 text-sm mb-3">Collaborate live with multi‑cursor support and shareable rooms. Perfect for reviews and interviews.</p>
+          <div className="inline-flex items-center gap-1 text-blue-300 group-hover:text-blue-200">
+            <span>Open Editor</span>
+            <span>→</span>
           </div>
-          <p className="text-white/80 text-sm">See relevant posts and resources based on your year, interests, and active goals so important content never gets lost.</p>
-        </div>
-        <div className="glass-card p-6 text-white hover-glow hover-raise">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-fuchsia-500/30">📈</span>
-            <div className="text-lg font-semibold">Trending Insights</div>
+        </motion.a>
+
+        {/* AI Mock Interview */}
+        <motion.a href="/guide#mock-interview" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(16,185,129,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-emerald-500/30">🤖</span>
+              <div className="text-lg font-semibold">AI Mock Interview</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Explore</span>
           </div>
-          <p className="text-white/80 text-sm">Discover what’s popular right now—top posts, categories, and profiles—so you can jump into high‑value discussions quickly.</p>
-        </div>
-        <div className="glass-card p-6 text-white hover-glow hover-raise">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-lime-500/30">🔔</span>
-            <div className="text-lg font-semibold">Notifications</div>
+          <p className="text-white/80 text-sm mb-3">Practice interviews with AI, get instant feedback, and improve your answers.</p>
+          <div className="inline-flex items-center gap-1 text-emerald-300 group-hover:text-emerald-200">
+            <span>Try Now</span>
+            <span>→</span>
           </div>
-          <p className="text-white/80 text-sm">Stay updated with follows, comments, and mentions. Never miss a reply, opportunity, or shared resource from your network.</p>
-        </div>
-        <div className="glass-card p-6 text-white hover-glow hover-raise">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-violet-500/30">☁️</span>
-            <div className="text-lg font-semibold">Cloud Uploads</div>
+        </motion.a>
+
+        {/* Resume Builder */}
+        <motion.a href="/guide#resume" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(245,158,11,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-amber-500/30">📄</span>
+              <div className="text-lg font-semibold">Resume Builder</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Create</span>
           </div>
-          <p className="text-white/80 text-sm">Share PDFs, images, and links neatly. Your materials stay organized and accessible across devices.</p>
-        </div>
-        <div className="glass-card p-6 text-white hover-glow hover-raise">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-rose-500/30">🧩</span>
-            <div className="text-lg font-semibold">Modular UI</div>
+          <p className="text-white/80 text-sm mb-3">Build polished resumes with templates and tips tailored for tech roles.</p>
+          <div className="inline-flex items-center gap-1 text-amber-300 group-hover:text-amber-200">
+            <span>Start Building</span>
+            <span>→</span>
           </div>
-          <p className="text-white/80 text-sm">Clean, distraction‑free design with light/dark themes and reusable blocks so pages feel cohesive and fast.</p>
-        </div>
-      </div>
+        </motion.a>
+
+        {/* Task Scheduler */}
+        <motion.a href="/guide#tasks" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(168,85,247,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-purple-500/30">🗓️</span>
+              <div className="text-lg font-semibold">Task Scheduler</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Plan</span>
+          </div>
+          <p className="text-white/80 text-sm mb-3">Plan study sessions, set reminders, and track progress with streaks.</p>
+          <div className="inline-flex items-center gap-1 text-purple-300 group-hover:text-purple-200">
+            <span>Explore</span>
+            <span>→</span>
+          </div>
+        </motion.a>
+
+        {/* Existing features */}
+        <motion.a href="/guide#chat" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(14,165,233,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-sky-500/30">💬</span>
+              <div className="text-lg font-semibold">Real‑time Chat</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Explore</span>
+          </div>
+          <p className="text-white/80 text-sm mb-3">Discuss doubts instantly with seniors and friends. Private groups and DMs make collaboration smooth during late‑night study sessions.</p>
+          <div className="inline-flex items-center gap-1 text-sky-300 group-hover:text-sky-200">
+            <span>Learn more</span>
+            <span>→</span>
+          </div>
+        </motion.a>
+        <motion.a href="/guide#trending" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(217,70,239,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-fuchsia-500/30">📈</span>
+              <div className="text-lg font-semibold">Trending Insights</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Explore</span>
+          </div>
+          <p className="text-white/80 text-sm mb-3">Discover what’s popular right now—top posts, categories, and profiles—so you can jump into high‑value discussions quickly.</p>
+          <div className="inline-flex items-center gap-1 text-fuchsia-300 group-hover:text-fuchsia-200">
+            <span>Dive in</span>
+            <span>→</span>
+          </div>
+        </motion.a>
+        <motion.a href="/guide#notifications" className="group glass-card p-6 text-white hover-glow hover-raise transition-transform hover:scale-[1.02]"
+          variants={cardVariants} whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(132,204,22,0.25)' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex w-10 h-10 items-center justify-center rounded-full bg-lime-500/30">🔔</span>
+              <div className="text-lg font-semibold">Notifications</div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-full bg-white/10 border border-white/10">Explore</span>
+          </div>
+          <p className="text-white/80 text-sm mb-3">Stay updated with follows, comments, and mentions. Never miss a reply, opportunity, or shared resource from your network.</p>
+          <div className="inline-flex items-center gap-1 text-lime-300 group-hover:text-lime-200">
+            <span>See how</span>
+            <span>→</span>
+          </div>
+        </motion.a>
+      </motion.div>
     </div>
   )
 }
+
+// CodeEditorSection was merged into PlatformFeaturesSection per design update
 
 export function ReviewsSection() {
   return (
@@ -944,20 +1061,56 @@ export function CareerSection() {
 export function FooterSection() {
   return (
     <footer className="glass-card p-8 text-white section-wrap hover-glow hover-raise">
-      <div className="grid md:grid-cols-4 gap-8">
-        <div className="space-y-3">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-8">
+        {/* Brand */}
+        <div className="space-y-3 xl:col-span-1">
           <div className="text-xl font-semibold">GL PeerBajaj</div>
           <p className="text-white/80 text-sm">A student community for curated learning, peer mentorship, and placement preparation.</p>
-          <div className="flex items-center gap-3">
-            <a href="https://www.instagram.com/gl.peerbajaj/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
-              <span>📸</span><span>Instagram</span>
-            </a>
-            <a href="https://www.linkedin.com/company/glpeerbajaj" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm">
-              <span>💼</span><span>LinkedIn</span>
-            </a>
-          </div>
         </div>
 
+        {/* Core */}
+        <div>
+          <div className="text-white font-semibold mb-3">Core</div>
+          <ul className="space-y-2 text-white/80 text-sm">
+            <li><Link to="/" className="hover:text-white">Home</Link></li>
+            <li><Link to="/sitemap" className="hover:text-white">All</Link></li>
+            <li><Link to="/feed" className="hover:text-white">Notifications</Link></li>
+            <li><Link to="/guide" className="hover:text-white">Guide</Link></li>
+          </ul>
+        </div>
+
+        {/* Explore */}
+        <div>
+          <div className="text-white font-semibold mb-3">Explore</div>
+          <ul className="space-y-2 text-white/80 text-sm">
+            <li><Link to="/feed" className="hover:text-white">Your Feed</Link></li>
+            <li><Link to="/trending" className="hover:text-white">Trending</Link></li>
+            <li><Link to="/team" className="hover:text-white">Our Team</Link></li>
+            <li><a href="#StudyMaterials" className="hover:text-white">Study Materials</a></li>
+            <li><a href="#PlacementPrepSection" className="hover:text-white">Placement Prep</a></li>
+          </ul>
+        </div>
+
+        {/* Create */}
+        <div>
+          <div className="text-white font-semibold mb-3">Create</div>
+          <ul className="space-y-2 text-white/80 text-sm">
+            <li><Link to="/chat" className="hover:text-white">Messages</Link></li>
+          </ul>
+        </div>
+
+        {/* Platform Features */}
+        <div>
+          <div className="text-white font-semibold mb-3">Platform Features</div>
+          <ul className="space-y-2 text-white/80 text-sm">
+            <li><Link to="/editor/demo" className="hover:text-white">Realtime Code Editor</Link></li>
+            <li><a href="/guide#mock-interview" className="hover:text-white">AI Mock Interview</a></li>
+            <li><a href="/guide#resume" className="hover:text-white">Resume Builder</a></li>
+            <li><a href="/guide#tasks" className="hover:text-white">Task Scheduler</a></li>
+          </ul>
+        </div>
+
+        {/* Quick Links */}
         <div>
           <div className="text-white font-semibold mb-3">Quick Links</div>
           <ul className="space-y-2 text-white/80 text-sm">
@@ -970,35 +1123,23 @@ export function FooterSection() {
           </ul>
         </div>
 
+        {/* Social Links */}
         <div>
-          <div className="text-white font-semibold mb-3">Resources</div>
+          <div className="text-white font-semibold mb-3">Social Links</div>
           <ul className="space-y-2 text-white/80 text-sm">
-            <li><a href="/trending" className="hover:text-white">Trending</a></li>
-            <li><a href="/feed" className="hover:text-white">Your Feed</a></li>
-            <li><a href="/team" className="hover:text-white">Our Team</a></li>
-            <li><a href="/guide" className="hover:text-white">User Guide</a></li>
-            <li><a href="#StudyMaterials" className="hover:text-white">Study Materials</a></li>
-            <li><a href="#PlacementPrepSection" className="hover:text-white">Placement Prep</a></li>
+            <li><a href="https://www.instagram.com/gl.peerbajaj/" target="_blank" rel="noreferrer" className="hover:text-white">📸 Instagram</a></li>
+            <li><a href="https://www.linkedin.com/company/glpeerbajaj" target="_blank" rel="noreferrer" className="hover:text-white">💼 LinkedIn</a></li>
           </ul>
         </div>
 
-        <div>
-          <div className="text-white font-semibold mb-3">Contact</div>
-          <ul className="space-y-2 text-white/80 text-sm">
-            <li className="flex items-center gap-2"><span>✉️</span><a href="mailto:glpeerbajaj@gmail.com" className="hover:text-white">glpeerbajaj@gmail.com</a></li>
-            <li className="flex items-center gap-2"><span>☎️</span><a href="tel:+910000000000" className="hover:text-white">+91 0000000000</a></li>
-            <li className="flex items-center gap-2"><span>📍</span><span>GL PeerBajaj, India</span></li>
-          </ul>
-        </div>
       </div>
 
       <div className="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm text-white/80">
         <div>© {new Date().getFullYear()} GL PeerBajaj. All rights reserved.</div>
         <nav className="flex flex-wrap gap-4">
-          <a href="#" className="hover:text-white">Privacy</a>
-          <a href="#" className="hover:text-white">Terms</a>
-          <a href="#" className="hover:text-white">Contact</a>
-          <a href="/editor/demo" className="hover:text-white">Code Editor</a>
+          <Link to="/privacy" className="hover:text-white">Privacy</Link>
+          <Link to="/terms" className="hover:text-white">Terms</Link>
+          <Link to="/contact" className="hover:text-white">Contact</Link>
         </nav>
       </div>
     </footer>
