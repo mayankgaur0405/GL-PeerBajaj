@@ -14,14 +14,14 @@ const NotificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['new_follower', 'new_post', 'like', 'comment', 'mention', 'chat'],
+      enum: ['new_follower', 'new_post', 'like', 'comment', 'share', 'mention', 'chat'],
       required: true
     },
     postId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Post',
       required: function() {
-        return ['new_post', 'like', 'comment', 'mention'].includes(this.type);
+        return ['new_post', 'like', 'comment', 'share', 'mention'].includes(this.type);
       }
     },
     chatId: {

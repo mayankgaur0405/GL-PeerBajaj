@@ -5,8 +5,6 @@ import api from '../lib/api.js';
 export default function EditPost({ post, onUpdate, onCancel }) {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
-    title: '',
-    content: '',
     section: {
       title: '',
       description: '',
@@ -27,11 +25,9 @@ export default function EditPost({ post, onUpdate, onCancel }) {
   useEffect(() => {
     if (post) {
       setFormData({
-        title: post.title || '',
-        content: post.content || '',
         section: {
-          title: post.section?.title || '',
-          description: post.section?.description || '',
+          title: post.section?.title || post.title || '',
+          description: post.section?.description || post.content || '',
           category: post.section?.category || '',
           resources: post.section?.resources || []
         },
@@ -43,13 +39,13 @@ export default function EditPost({ post, onUpdate, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+    if (!formData.section.title.trim()) return;
 
     setLoading(true);
     try {
       const postData = {
-        title: formData.title,
-        content: formData.content,
+        title: formData.section.title, // Use section title as main title
+        content: formData.section.description, // Use section description as content
         tags: formData.tags.filter(tag => tag.trim())
       };
 
@@ -190,78 +186,57 @@ export default function EditPost({ post, onUpdate, onCancel }) {
           </div>
         </div>
 
-        {/* Title */}
+        {/* Post Title and Content - Available for all post types */}
         <div>
-          <label className="block text-sm font-medium text-white/80 mb-2">Title *</label>
+          <label className="block text-sm font-medium text-white/80 mb-2">Post Title *</label>
           <input
             type="text"
-            value={formData.title}
-            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+            value={formData.section.title}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              section: { ...prev.section, title: e.target.value }
+            }))}
             className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter post title..."
             required
           />
         </div>
 
-        {/* Content */}
         <div>
-          <label className="block text-sm font-medium text-white/80 mb-2">Content</label>
+          <label className="block text-sm font-medium text-white/80 mb-2">Post Content</label>
           <textarea
-            value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+            value={formData.section.description}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              section: { ...prev.section, description: e.target.value }
+            }))}
             className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={4}
-            placeholder="Write your post content..."
+            placeholder="Write your post content... (supports line breaks and formatting)"
           />
+        </div>
+
+        {/* Category - Available for all post types */}
+        <div>
+          <label className="block text-sm font-medium text-white/80 mb-2">Category</label>
+          <select
+            value={formData.section.category}
+            onChange={(e) => setFormData(prev => ({
+              ...prev,
+              section: { ...prev.section, category: e.target.value }
+            }))}
+            className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select category</option>
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
         </div>
 
         {/* Section-specific fields */}
         {post.type === 'section' && (
           <div className="space-y-4 border-t border-white/10 pt-4">
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">Section Title</label>
-              <input
-                type="text"
-                value={formData.section.title}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  section: { ...prev.section, title: e.target.value }
-                }))}
-                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., React Fundamentals"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">Category</label>
-              <select
-                value={formData.section.category}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  section: { ...prev.section, category: e.target.value }
-                }))}
-                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Select category</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">Section Description</label>
-              <textarea
-                value={formData.section.description}
-                onChange={(e) => setFormData(prev => ({
-                  ...prev,
-                  section: { ...prev.section, description: e.target.value }
-                }))}
-                className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={3}
-                placeholder="Describe this section/roadmap..."
-              />
-            </div>
 
             {/* Resources */}
             <div>
@@ -397,7 +372,7 @@ export default function EditPost({ post, onUpdate, onCancel }) {
           </button>
           <button
             type="submit"
-            disabled={loading || !formData.title.trim()}
+            disabled={loading || !formData.section.title.trim()}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
           >
             {loading ? 'Updating...' : 'Update Post'}

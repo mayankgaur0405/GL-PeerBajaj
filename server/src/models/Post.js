@@ -26,7 +26,7 @@ const PostSchema = new mongoose.Schema(
       required: true,
       index: true 
     },
-    title: { type: String, required: true, maxlength: 200 },
+    title: { type: String, maxlength: 200 },
     content: { type: String, maxlength: 5000 },
     
     // For section/roadmap posts

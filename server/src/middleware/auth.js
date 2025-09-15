@@ -4,11 +4,16 @@ import { User } from '../models/User.js';
 export async function authRequired(req, res, next) {
   const token = req.cookies?.accessToken || (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.split(' ')[1] : null);
   
+  console.log('Auth middleware - URL:', req.url);
+  console.log('Auth middleware - Method:', req.method);
   console.log('Auth middleware - Token found:', !!token);
   console.log('Auth middleware - Cookies:', req.cookies);
   console.log('Auth middleware - Headers:', req.headers.authorization);
   
-  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+  if (!token) {
+    console.log('Auth middleware - No token found, returning 401');
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
   
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET || 'secret');
@@ -17,13 +22,16 @@ export async function authRequired(req, res, next) {
     
     // Fetch and attach user object
     const user = await User.findById(decoded.id).select('-password');
-    if (!user) return res.status(401).json({ message: 'User not found' });
+    if (!user) {
+      console.log('Auth middleware - User not found for ID:', decoded.id);
+      return res.status(401).json({ message: 'User not found' });
+    }
     
     req.user = user;
-    console.log('Decoded user:', { id: user._id, name: user.name, username: user.username });
+    console.log('Auth middleware - User authenticated:', { id: user._id, name: user.name, username: user.username });
     next();
   } catch (e) {
-    console.error('Auth error:', e.message);
+    console.error('Auth middleware - JWT verification error:', e.message);
     return res.status(401).json({ message: 'Unauthorized' });
   }
 }

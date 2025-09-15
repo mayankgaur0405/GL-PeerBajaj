@@ -8,15 +8,21 @@ export async function createPost(req, res, next) {
   try {
     const { type, title, content, section, images, tags } = req.body;
     
-    if (!type || !title) {
-      return res.status(400).json({ message: 'Type and title are required' });
+    if (!type) {
+      return res.status(400).json({ message: 'Type is required' });
+    }
+
+    // Use section title as main title if available, otherwise use provided title
+    const mainTitle = section?.title || title;
+    if (!mainTitle) {
+      return res.status(400).json({ message: 'Title is required' });
     }
 
     const postData = {
       author: req.userId,
       type,
-      title,
-      content: content || '',
+      title: mainTitle,
+      content: content || section?.description || '',
       tags: tags || []
     };
 
@@ -264,14 +270,17 @@ export async function toggleLike(req, res, next) {
       await User.findByIdAndUpdate(post.author, { $inc: { totalLikes: 1 } });
       
       // Create notification for like
-      await Notification.createNotification({
-        recipient: post.author,
-        sender: userId,
-        type: 'like',
-        title: 'New Like',
-        message: 'Someone liked your post',
-        post: post._id
-      });
+      try {
+        await Notification.createNotification({
+          receiverId: post.author,
+          senderId: userId,
+          type: 'like',
+          postId: post._id
+        });
+      } catch (notifError) {
+        console.error('Failed to create like notification:', notifError);
+        // Don't fail the like operation if notification fails
+      }
     }
 
     await post.save();
@@ -309,15 +318,17 @@ export async function addComment(req, res, next) {
     await post.save();
 
     // Create notification for comment
-    await Notification.createNotification({
-      recipient: post.author,
-      sender: req.userId,
-      type: 'comment',
-      title: 'New Comment',
-      message: 'Someone commented on your post',
-      post: post._id,
-      comment: post.comments[post.comments.length - 1]._id
-    });
+    try {
+      await Notification.createNotification({
+        receiverId: post.author,
+        senderId: req.userId,
+        type: 'comment',
+        postId: post._id
+      });
+    } catch (notifError) {
+      console.error('Failed to create comment notification:', notifError);
+      // Don't fail the comment operation if notification fails
+    }
 
     // Populate the new comment
     await post.populate('comments.author', 'name username profilePicture');
@@ -333,32 +344,52 @@ export async function addComment(req, res, next) {
 export async function deleteComment(req, res, next) {
   try {
     const { id, commentId } = req.params;
+    console.log('Delete comment - Post ID:', id, 'Comment ID:', commentId, 'User ID:', req.userId);
+
+    // Validate ObjectIds
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: 'Invalid post ID' });
+    }
+    if (!mongoose.isValidObjectId(commentId)) {
+      return res.status(400).json({ message: 'Invalid comment ID' });
+    }
 
     const post = await Post.findById(id);
     if (!post) {
+      console.log('Post not found:', id);
       return res.status(404).json({ message: 'Post not found' });
     }
 
     const comment = post.comments.id(commentId);
     if (!comment) {
+      console.log('Comment not found:', commentId);
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    if (comment.author.toString() !== req.userId) {
+    // Allow both comment author and post author to delete comments
+    const isCommentAuthor = comment.author.toString() === req.userId;
+    const isPostAuthor = post.author.toString() === req.userId;
+    
+    console.log('Authorization check - Comment author:', isCommentAuthor, 'Post author:', isPostAuthor);
+    
+    if (!isCommentAuthor && !isPostAuthor) {
       return res.status(403).json({ message: 'Not authorized to delete this comment' });
     }
 
-    comment.remove();
+    console.log('Removing comment...');
+    post.comments.pull(commentId);
     await post.save();
+    console.log('Comment deleted successfully');
 
     res.json({ message: 'Comment deleted successfully' });
   } catch (err) {
+    console.error('Error deleting comment:', err);
     next(err);
   }
 }
 
-// SHARE POST
-export async function sharePost(req, res, next) {
+// TRACK SHARE
+export async function trackShare(req, res, next) {
   try {
     const { id } = req.params;
     const userId = req.userId;
@@ -368,27 +399,26 @@ export async function sharePost(req, res, next) {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if already shared by this user
-    const alreadyShared = post.shares.some(share => share.user.toString() === userId);
-    if (alreadyShared) {
-      return res.status(400).json({ message: 'Post already shared' });
+    // Add share tracking (allow multiple shares from same user)
+    post.shares.push({ user: userId });
+    
+    // Create notification for share
+    try {
+      await Notification.createNotification({
+        receiverId: post.author,
+        senderId: userId,
+        type: 'share',
+        postId: post._id
+      });
+    } catch (notifError) {
+      console.error('Failed to create share notification:', notifError);
+      // Don't fail the share operation if notification fails
     }
 
-    post.shares.push({ user: userId });
     await post.save();
 
-    // Create notification for share
-    await Notification.createNotification({
-      recipient: post.author,
-      sender: userId,
-      type: 'share',
-      title: 'Post Shared',
-      message: 'Someone shared your post',
-      post: post._id
-    });
-
     res.json({ 
-      message: 'Post shared successfully',
+      message: 'Share tracked successfully',
       sharesCount: post.shares.length 
     });
   } catch (err) {

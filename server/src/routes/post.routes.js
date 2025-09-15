@@ -10,7 +10,7 @@ import {
   toggleLike,
   addComment,
   deleteComment,
-  sharePost,
+  trackShare,
   getTrendingPosts,
   getUserPosts
 } from '../controllers/post.controller.js';
@@ -33,6 +33,6 @@ router.delete('/:id', authRequired, deletePost);
 router.post('/:id/like', authRequired, toggleLike);
 router.post('/:id/comment', authRequired, addComment);
 router.delete('/:id/comments/:commentId', authRequired, deleteComment);
-router.post('/:id/share', authRequired, sharePost);
+router.post('/:id/share', authRequired, trackShare);
 
 export default router;
