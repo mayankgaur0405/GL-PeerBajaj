@@ -20,6 +20,8 @@ export default function Profile() {
   // Tabs for profile sections (keep hooks before any early returns)
   const [activeTab, setActiveTab] = useState('posts')
   const [activePostTab, setActivePostTab] = useState('section')
+  const [savedFiles, setSavedFiles] = useState([])
+  const [filesLoading, setFilesLoading] = useState(false)
   const filtersByTab = useMemo(() => ({
     section: { type: 'section' },
     text: { type: 'text' },
@@ -41,6 +43,20 @@ export default function Profile() {
     }
     load()
   }, [id])
+
+  useEffect(() => {
+    async function loadFiles() {
+      if (activeTab !== 'files') return
+      setFilesLoading(true)
+      try {
+        const res = await api.get(`/files/${id}`)
+        setSavedFiles(res.data.files || [])
+      } finally {
+        setFilesLoading(false)
+      }
+    }
+    loadFiles()
+  }, [activeTab, id])
 
   const follow = async () => {
     await api.post(`/users/${id}/follow`)
@@ -249,6 +265,7 @@ export default function Profile() {
         <div className="tab-group w-full md:w-auto">
           {[
             { key: 'posts', label: 'Posts' },
+            { key: 'files', label: 'Files' },
             { key: 'followers', label: `Followers (${profile.followers?.length || 0})` },
             { key: 'following', label: `Following (${profile.following?.length || 0})` }
           ].map(t => (
@@ -295,6 +312,45 @@ export default function Profile() {
 
         {activeTab === 'following' && (
           <FollowingList userId={profile._id} isOwnProfile={isOwnProfile} />
+        )}
+
+        {activeTab === 'files' && (
+          <div className="space-y-3">
+            {filesLoading ? (
+              <div>Loading files...</div>
+            ) : savedFiles.length === 0 ? (
+              <div className="text-sm text-gray-400">No files saved.</div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-4">
+                {savedFiles.map(f => (
+                  <div key={f._id} className="glass-card p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="font-semibold">{f.filename}</div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${f.visibility === 'public' ? 'bg-green-500/20 text-green-300' : 'bg-white/10 text-white/70'}`}>{f.visibility}</span>
+                    </div>
+                    <div className="text-xs text-gray-400">Room: {f.roomId}</div>
+                    <pre className="bg-black/40 text-white/80 rounded p-2 text-xs max-h-40 overflow-auto whitespace-pre-wrap break-words">{(f.content || '').slice(0, 600) || ' '}</pre>
+                    {isOwnProfile && (
+                      <div className="flex items-center gap-2">
+                        <select
+                          className="px-2 py-1 rounded bg-white/10 text-white/90 border border-white/10 text-xs"
+                          value={f.visibility}
+                          onChange={async (e)=>{
+                            const v = e.target.value
+                            const res = await api.put(`/files/${f._id}/visibility`, { visibility: v })
+                            setSavedFiles(prev => prev.map(x => x._id === f._id ? res.data.file : x))
+                          }}
+                        >
+                          <option value="private">Private</option>
+                          <option value="public">Public</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

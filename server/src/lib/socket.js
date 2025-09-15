@@ -380,7 +380,10 @@ export function setupSocketHandlers(io) {
       room.language = String(language || 'javascript');
       collab.to(roomKey).emit('languageUpdate', room.language);
       try {
-        await EditorDoc.updateOne({ roomId: roomKey }, { $set: { 'files.$[p].language': room.language } }, { arrayFilters: [{ 'p._id': { $exists: true } }], upsert: false });
+        const activeId = room.activeFileId;
+        if (activeId) {
+          await EditorDoc.updateOne({ roomId: roomKey, 'files._id': activeId }, { $set: { 'files.$.language': room.language } });
+        }
       } catch {}
     });
 
@@ -424,25 +427,41 @@ export function setupSocketHandlers(io) {
       if (!roomKey) return;
       const room = collabRooms.get(roomKey);
       if (!room) return;
-      const file = { _id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), name: String(name || 'untitled'), language: String(language || room.language || 'javascript'), content: '' };
-      room.files = room.files || [];
-      room.files.push(file);
-      room.activeFileId = file._id;
-      room.code = '';
-      room.language = file.language;
-      collab.to(roomKey).emit('filesState', { files: room.files, activeFileId: room.activeFileId });
-      collab.to(roomKey).emit('codeUpdate', room.code);
-      collab.to(roomKey).emit('languageUpdate', room.language);
+      const newName = String(name || 'untitled');
+      const newLang = String(language || room.language || 'javascript');
       try {
         const doc = await EditorDoc.findOne({ roomId: roomKey });
         if (!doc) {
-          const created = await EditorDoc.create({ roomId: roomKey, files: [{ name: file.name, language: file.language, content: '' }], activeFileId: undefined });
-          await EditorDoc.updateOne({ _id: created._id }, { $set: { activeFileId: created.files[0]._id.toString() } });
+          // ensure main exists and then add requested file name
+          const initialFiles = [{ name: 'main', language: newLang, content: '' }];
+          if (newName !== 'main') initialFiles.push({ name: newName, language: newLang, content: '' });
+          const created = await EditorDoc.create({ roomId: roomKey, files: initialFiles, activeFileId: undefined });
+          const activeId = created.files[0]._id.toString();
+          await EditorDoc.updateOne({ _id: created._id }, { $set: { activeFileId: activeId } });
+          const fresh = await EditorDoc.findById(created._id);
+          room.files = fresh.files.map(f => ({ _id: f._id.toString(), name: f.name, language: f.language, content: f.content }));
+          room.activeFileId = fresh.activeFileId?.toString() || activeId;
+          room.code = fresh.files.id(room.activeFileId)?.content || '';
+          room.language = fresh.files.id(room.activeFileId)?.language || newLang;
         } else {
-          doc.files.push({ name: file.name, language: file.language, content: '' });
+          // do not remove main; ensure unique newFile names
+          const names = new Set(doc.files.map(f => f.name));
+          let candidate = newName.startsWith('newFile_') ? newName : 'newFile_1';
+          let n = 1;
+          while (names.has(candidate)) { n += 1; candidate = `newFile_${n}`; }
+          doc.files.push({ name: candidate, language: newLang, content: '' });
           doc.activeFileId = doc.files[doc.files.length - 1]._id.toString();
           await doc.save();
+          const fresh = await EditorDoc.findById(doc._id);
+          room.files = fresh.files.map(f => ({ _id: f._id.toString(), name: f.name, language: f.language, content: f.content }));
+          room.activeFileId = fresh.activeFileId?.toString();
+          const active = fresh.files.id(room.activeFileId);
+          room.code = active?.content || '';
+          room.language = active?.language || newLang;
         }
+        collab.to(roomKey).emit('filesState', { files: room.files, activeFileId: room.activeFileId });
+        collab.to(roomKey).emit('codeUpdate', room.code);
+        collab.to(roomKey).emit('languageUpdate', room.language);
       } catch {}
     });
 
@@ -450,12 +469,12 @@ export function setupSocketHandlers(io) {
       const roomKey = String(roomId || '');
       const room = collabRooms.get(roomKey);
       if (!room || !room.files) return;
-      const f = room.files.find(x => x._id === fileId);
-      if (!f) return;
-      f.name = String(name || f.name);
-      collab.to(roomKey).emit('filesState', { files: room.files, activeFileId: room.activeFileId });
+      const newName = String(name || '');
       try {
-        await EditorDoc.updateOne({ roomId: roomKey, 'files._id': fileId }, { $set: { 'files.$.name': f.name } });
+        await EditorDoc.updateOne({ roomId: roomKey, 'files._id': fileId }, { $set: { 'files.$.name': newName } });
+        const fresh = await EditorDoc.findOne({ roomId: roomKey });
+        room.files = fresh.files.map(f => ({ _id: f._id.toString(), name: f.name, language: f.language, content: f.content }));
+        collab.to(roomKey).emit('filesState', { files: room.files, activeFileId: room.activeFileId });
       } catch {}
     });
 
@@ -463,20 +482,24 @@ export function setupSocketHandlers(io) {
       const roomKey = String(roomId || '');
       const room = collabRooms.get(roomKey);
       if (!room || !room.files) return;
-      const idx = room.files.findIndex(x => x._id === fileId);
-      if (idx === -1) return;
-      room.files.splice(idx, 1);
-      if (room.activeFileId === fileId) {
-        const next = room.files[0];
-        room.activeFileId = next?._id || null;
-        room.code = next?.content || '';
-        room.language = next?.language || room.language;
-        collab.to(roomKey).emit('codeUpdate', room.code);
-        collab.to(roomKey).emit('languageUpdate', room.language);
-      }
-      collab.to(roomKey).emit('filesState', { files: room.files, activeFileId: room.activeFileId });
       try {
         await EditorDoc.updateOne({ roomId: roomKey }, { $pull: { files: { _id: fileId } } });
+        const fresh = await EditorDoc.findOne({ roomId: roomKey });
+        room.files = (fresh?.files || []).map(f => ({ _id: f._id.toString(), name: f.name, language: f.language, content: f.content }));
+        // Update active file selection safely
+        if (!fresh || fresh.files.length === 0) {
+          room.activeFileId = null;
+          room.code = '';
+        } else {
+          const nextId = fresh.activeFileId?.toString() || fresh.files[0]._id.toString();
+          room.activeFileId = nextId;
+          const active = fresh.files.id(nextId);
+          room.code = active?.content || '';
+          room.language = active?.language || room.language;
+          collab.to(roomKey).emit('languageUpdate', room.language);
+        }
+        collab.to(roomKey).emit('codeUpdate', room.code);
+        collab.to(roomKey).emit('filesState', { files: room.files, activeFileId: room.activeFileId });
       } catch {}
     });
 

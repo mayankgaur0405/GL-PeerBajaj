@@ -14,6 +14,7 @@ import notificationRoutes from "./routes/notification.routes.js";
 import trendingRoutes from "./routes/trending.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import followRoutes from "./routes/follow.routes.js";
+import fileRoutes from "./routes/file.routes.js";
 import feedRoutes from "./routes/feed.routes.js";
 import feedbackRoutes from "./routes/feedback.routes.js";
 import { notFoundHandler, errorHandler } from "./middleware/error.js";
@@ -94,6 +95,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/trending", trendingRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/follow", followRoutes);
+app.use("/api/files", fileRoutes);
 app.use("/api/feed", feedRoutes);
 app.use("/api/feedback", feedbackRoutes);
 
