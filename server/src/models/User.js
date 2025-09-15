@@ -63,7 +63,11 @@ const UserSchema = new mongoose.Schema(
     totalLikes: { type: Number, default: 0 },
     
     // Trending score for profiles
-    trendingScore: { type: Number, default: 0, index: true }
+    trendingScore: { type: Number, default: 0, index: true },
+
+    // Email verification
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerifiedAt: { type: Date }
   },
   { 
     timestamps: true,

@@ -35,13 +35,34 @@ export function AuthProvider({ children }) {
 
   const signup = async (payload) => {
     try {
-      const res = await api.post('/auth/register', payload, { withCredentials: true });
-      setUser(res.data.user);
-      return res;
+      // Backwards compatibility: keep old endpoint if provided with full payload
+      if (payload?.name && payload?.username && payload?.password) {
+        const res = await api.post('/auth/register', payload, { withCredentials: true });
+        setUser(res.data.user);
+        return res;
+      }
+      return Promise.reject(new Error('Use OTP signup flow.'));
     } catch (error) {
       // Re-throw the error to be handled by the component
       throw error;
     }
+  };
+
+  // OTP-based signup flow
+  const startSignup = async (email) => {
+    const res = await api.post('/auth/signup/start', { email }, { withCredentials: true });
+    return res.data;
+  };
+
+  const verifySignupOtp = async ({ email, otp }) => {
+    const res = await api.post('/auth/signup/verify', { email, otp }, { withCredentials: true });
+    return res.data; // { completeToken }
+  };
+
+  const completeSignup = async ({ completeToken, name, username, password }) => {
+    const res = await api.post('/auth/signup/complete', { completeToken, name, username, password }, { withCredentials: true });
+    setUser(res.data.user);
+    return res.data;
   };
 
   const logout = async () => {
@@ -50,7 +71,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout, setUser, startSignup, verifySignupOtp, completeSignup }}>
       {children}
     </AuthContext.Provider>
   );
