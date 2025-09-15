@@ -998,6 +998,7 @@ export function FooterSection() {
           <a href="#" className="hover:text-white">Privacy</a>
           <a href="#" className="hover:text-white">Terms</a>
           <a href="#" className="hover:text-white">Contact</a>
+          <a href="/editor/demo" className="hover:text-white">Code Editor</a>
         </nav>
       </div>
     </footer>

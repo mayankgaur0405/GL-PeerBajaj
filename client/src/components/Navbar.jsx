@@ -71,6 +71,19 @@ export default function Navbar() {
               </NavLink>
 
               <NavLink 
+                to="/editor/demo" 
+                className={({ isActive }) => 
+                  `flex items-center space-x-1 transition-base ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
+                }
+                title="Collaborative Code Editor"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
+                </svg>
+                <span>Code Editor</span>
+              </NavLink>
+
+              <NavLink 
                 to="/trending" 
                 className={({ isActive }) => 
                   `flex items-center space-x-1 transition-base ${isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}`
@@ -190,6 +203,10 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              <NavLink 
+                to="/editor/demo" 
+                className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}
+              >Code Editor</NavLink>
               <NavLink to="/login" className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}>Login</NavLink>
               <NavLink to="/signup" className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}>Signup</NavLink>
             </>
