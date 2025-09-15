@@ -192,10 +192,6 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <NavLink 
-                to="/editor/demo" 
-                className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}
-              >Code Editor</NavLink>
               <NavLink to="/login" className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}>Login</NavLink>
               <NavLink to="/signup" className={({ isActive }) => isActive ? 'text-blue-400' : 'text-white/80 hover:text-blue-400'}>Signup</NavLink>
             </>
