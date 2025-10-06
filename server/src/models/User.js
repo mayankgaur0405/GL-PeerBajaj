@@ -35,7 +35,7 @@ const UserSchema = new mongoose.Schema(
         validator: function(email) {
           return validateGLBITMEmail(email).isValid;
         },
-        message: 'Please use your college email ending with @glbitm.ac.in'
+        message: 'Please enter a valid email address'
       }
     },
     password: { type: String, required: true },

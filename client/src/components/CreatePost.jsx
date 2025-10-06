@@ -13,7 +13,7 @@ export default function CreatePost({ onPostCreated }) {
       title: '',
       description: '',
       category: '',
-      resources: []
+      resources: [{ title: '', link: '', description: '' }] // Initialize with one empty resource
     },
     images: [],
     tags: []
@@ -41,7 +41,14 @@ export default function CreatePost({ onPostCreated }) {
       };
 
       if (postType === 'section') {
-        postData.section = formData.section;
+        // Filter out empty resources before submitting
+        const filteredResources = formData.section.resources.filter(resource => 
+          resource.title.trim() || resource.link.trim() || resource.description.trim()
+        );
+        postData.section = {
+          ...formData.section,
+          resources: filteredResources
+        };
       }
 
       if (postType === 'image' && formData.images.length > 0) {
@@ -63,16 +70,7 @@ export default function CreatePost({ onPostCreated }) {
       setTimeout(() => setShowSuccess(false), 3000);
       
       // Reset form
-      setFormData({
-        section: {
-          title: '',
-          description: '',
-          category: '',
-          resources: []
-        },
-        images: [],
-        tags: []
-      });
+      resetForm();
       setIsOpen(false);
       
       // Call the callback if provided
@@ -197,6 +195,20 @@ export default function CreatePost({ onPostCreated }) {
     }));
   };
 
+  const resetForm = () => {
+    setFormData({
+      section: {
+        title: '',
+        description: '',
+        category: '',
+        resources: [{ title: '', link: '', description: '' }]
+      },
+      images: [],
+      tags: []
+    });
+    setPostType('text');
+  };
+
   if (!isOpen) {
     return (
       <>
@@ -249,7 +261,10 @@ export default function CreatePost({ onPostCreated }) {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Create Post</h2>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              resetForm();
+            }}
             className="text-white/60 hover:text-white"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,60 +346,143 @@ export default function CreatePost({ onPostCreated }) {
           </select>
         </div>
 
-        {/* Section-specific fields */}
-        {postType === 'section' && (
-          <div className="space-y-4 border-t pt-4">
-
-            {/* Resources */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-white/80">Resources</label>
-                <button
-                  type="button"
-                  onClick={addResource}
-                  className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                >
-                  Add Resource
-                </button>
+        {/* Resources - Available for all post types */}
+        <div className="space-y-4 border-t pt-4">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <label className="block text-sm font-medium text-white/80">
+                Resources {postType === 'section' && <span className="text-red-400">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={addResource}
+                className="flex items-center gap-2 text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <span>+</span>
+                <span>Add Another Resource</span>
+              </button>
+            </div>
+            
+            {/* Always show at least one resource field */}
+            <div className="glass-card p-4 mb-3 space-y-3">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-white">Resource 1</h4>
+                  {postType === 'section' && (
+                    <span className="text-xs text-red-400">Required</span>
+                  )}
+                </div>
+                {formData.section.resources.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeResource(0)}
+                    className="text-red-400 hover:text-red-300 transition-colors p-1"
+                    title="Remove resource"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
-              {formData.section.resources.map((resource, index) => (
-                <div key={index} className="glass-card p-3 mb-2 space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Resource {index + 1}</h4>
-                    <button
-                      type="button"
-                      onClick={() => removeResource(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
-                  </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-white/70 mb-1">Resource Title</label>
                   <input
                     type="text"
-                    value={resource.title}
-                    onChange={(e) => updateResource(index, 'title', e.target.value)}
-                    className="w-full rounded px-2 py-1 text-sm"
-                    placeholder="Resource title"
-                  />
-                  <input
-                    type="url"
-                    value={resource.link}
-                    onChange={(e) => updateResource(index, 'link', e.target.value)}
-                    className="w-full rounded px-2 py-1 text-sm"
-                    placeholder="Resource URL"
-                  />
-                  <input
-                    type="text"
-                    value={resource.description}
-                    onChange={(e) => updateResource(index, 'description', e.target.value)}
-                    className="w-full rounded px-2 py-1 text-sm"
-                    placeholder="Description (optional)"
+                    value={formData.section.resources[0]?.title || ''}
+                    onChange={(e) => updateResource(0, 'title', e.target.value)}
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 text-white placeholder-white/50 border border-white/20 focus:border-blue-400 focus:outline-none"
+                    placeholder="Enter resource title"
+                    required={postType === 'section'}
                   />
                 </div>
-              ))}
+                <div>
+                  <label className="block text-xs text-white/70 mb-1">Resource URL</label>
+                  <input
+                    type="url"
+                    value={formData.section.resources[0]?.link || ''}
+                    onChange={(e) => updateResource(0, 'link', e.target.value)}
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 text-white placeholder-white/50 border border-white/20 focus:border-blue-400 focus:outline-none"
+                    placeholder="https://example.com"
+                    required={postType === 'section'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/70 mb-1">Description (Optional)</label>
+                  <input
+                    type="text"
+                    value={formData.section.resources[0]?.description || ''}
+                    onChange={(e) => updateResource(0, 'description', e.target.value)}
+                    className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 text-white placeholder-white/50 border border-white/20 focus:border-blue-400 focus:outline-none"
+                    placeholder="Brief description of the resource"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Show additional resources if any */}
+            {formData.section.resources.slice(1).map((resource, index) => (
+              <div key={index + 1} className="glass-card p-4 mb-3 space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium text-white">Resource {index + 2}</h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeResource(index + 1)}
+                    className="text-red-400 hover:text-red-300 transition-colors p-1"
+                    title="Remove resource"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-white/70 mb-1">Resource Title</label>
+                    <input
+                      type="text"
+                      value={resource.title}
+                      onChange={(e) => updateResource(index + 1, 'title', e.target.value)}
+                      className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 text-white placeholder-white/50 border border-white/20 focus:border-blue-400 focus:outline-none"
+                      placeholder="Enter resource title"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/70 mb-1">Resource URL</label>
+                    <input
+                      type="url"
+                      value={resource.link}
+                      onChange={(e) => updateResource(index + 1, 'link', e.target.value)}
+                      className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 text-white placeholder-white/50 border border-white/20 focus:border-blue-400 focus:outline-none"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/70 mb-1">Description (Optional)</label>
+                    <input
+                      type="text"
+                      value={resource.description}
+                      onChange={(e) => updateResource(index + 1, 'description', e.target.value)}
+                      className="w-full rounded-lg px-3 py-2 text-sm bg-white/10 text-white placeholder-white/50 border border-white/20 focus:border-blue-400 focus:outline-none"
+                      placeholder="Brief description of the resource"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {/* Helper text */}
+            <div className="text-xs text-white/60 mt-2">
+              {postType === 'section' 
+                ? "At least one resource is required for roadmap/section posts to provide helpful links."
+                : "Add helpful resources and links to make your post more valuable to readers."
+              }
             </div>
           </div>
-        )}
+        </div>
 
         {/* Image upload */}
         {postType === 'image' && (

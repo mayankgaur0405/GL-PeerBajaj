@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSocket } from '../context/SocketContext.jsx'
 import { useUnreadCount } from '../context/UnreadCountContext.jsx'
+import { useMode } from '../context/ModeContext.jsx'
 import Notifications from './Notifications.jsx'
 import NotificationDropdown from './NotificationDropdown.jsx'
 
@@ -10,6 +11,7 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const { socket } = useSocket()
   const { notificationCount, messageCount, incrementNotificationCount, incrementMessageCount, updateNotificationCount } = useUnreadCount()
+  const { currentMode, toggleMode, modeConfig } = useMode()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false)
 
@@ -97,8 +99,25 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* Right: Auth controls */}
+        {/* Right: Mode toggle and Auth controls */}
         <div className="flex items-center gap-3">
+          {/* Mode Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-white/70">Mode:</span>
+            <button
+              onClick={toggleMode}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+                currentMode === 'social'
+                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                  : 'bg-green-600/20 text-green-400 border border-green-500/30'
+              } hover:scale-105`}
+              title={currentMode === 'social' ? 'Switch to Explore Mode' : 'Switch to Social Mode'}
+            >
+              <span className="text-lg">{modeConfig.icon}</span>
+              <span>{currentMode === 'social' ? 'Switch to Explore Mode' : 'Switch to Social Mode'}</span>
+            </button>
+          </div>
+
           {user ? (
             <>
               <Link to={`/profile/${user._id}`} className="flex items-center space-x-2">

@@ -1,11 +1,6 @@
 import { User } from '../models/User.js';
-import { EmailVerification } from '../models/EmailVerification.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/tokens.js';
 import { validateGLBITMEmail, validateEmailForAuth } from '../utils/emailValidation.js';
-import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
-import { sendOtpEmail } from '../lib/emailService.js';
-import jwt from 'jsonwebtoken';
 
 export async function register(req, res, next) {
   try {
@@ -106,92 +101,20 @@ function sanitize(user) {
   return obj;
 }
 
-// ===== OTP Signup Flow =====
-
-function generateNumericOtp(length = 6) {
-  const bytes = crypto.randomBytes(length);
-  let otp = '';
-  for (let i = 0; i < length; i++) {
-    otp += (bytes[i] % 10).toString();
-  }
-  return otp;
-}
+// ===== Direct Signup Flow =====
 
 export async function startSignup(req, res, next) {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email is required' });
+    const { name, email, username, password } = req.body;
+    if (!name || !email || !username || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    
     const emailValidation = validateGLBITMEmail(email);
     if (!emailValidation.isValid) return res.status(400).json({ message: emailValidation.message });
 
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(409).json({ message: 'Email already in use' });
-
-    const otp = generateNumericOtp(6);
-    const salt = await bcrypt.genSalt(10);
-    const otpHash = await bcrypt.hash(otp, salt);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
-    await EmailVerification.deleteMany({ email, context: 'signup', consumed: false });
-    await EmailVerification.create({ email, otpHash, expiresAt, context: 'signup' });
-
-    await sendOtpEmail({ to: email, otp });
-
-    res.json({ message: 'OTP sent to email' });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function verifyOtp(req, res, next) {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp) return res.status(400).json({ message: 'Email and OTP are required' });
-
-    const record = await EmailVerification.findOne({ email, context: 'signup', consumed: false }).sort({ createdAt: -1 });
-    if (!record) return res.status(400).json({ message: 'No OTP pending for this email' });
-    if (record.expiresAt < new Date()) return res.status(400).json({ message: 'OTP expired' });
-    if (record.attempts >= record.maxAttempts) return res.status(429).json({ message: 'Too many attempts' });
-
-    const ok = await bcrypt.compare(otp, record.otpHash);
-    record.attempts += 1;
-    if (!ok) {
-      await record.save();
-      return res.status(400).json({ message: 'Invalid OTP' });
-    }
-
-    record.consumed = true;
-    await record.save();
-
-    // issue a short-lived token to allow completing signup
-    const completeToken = signAccessToken({ email, stage: 'signup_verified' });
-    res.json({ message: 'OTP verified', completeToken });
-  } catch (err) {
-    next(err);
-  }
-}
-
-export async function completeSignup(req, res, next) {
-  try {
-    const { completeToken, name, username, password } = req.body;
-    if (!completeToken || !name || !username || !password) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    let decoded;
-    try {
-      decoded = jwtVerifySignupToken(completeToken);
-    } catch (e) {
-      return res.status(401).json({ message: 'Invalid or expired token' });
-    }
-
-    if (decoded.stage !== 'signup_verified' || !decoded.email) {
-      return res.status(401).json({ message: 'Invalid token stage' });
-    }
-
-    const email = decoded.email;
-    const exists = await User.findOne({ $or: [{ email }, { username }] });
-    if (exists) return res.status(409).json({ message: 'Email or username already in use' });
+    const existing = await User.findOne({ $or: [{ email }, { username }] });
+    if (existing) return res.status(409).json({ message: 'Email or username already in use' });
 
     const user = await User.create({ name, email, username, password, isEmailVerified: true, emailVerifiedAt: new Date() });
     const accessToken = signAccessToken({ id: user._id });
@@ -217,8 +140,5 @@ export async function completeSignup(req, res, next) {
   }
 }
 
-function jwtVerifySignupToken(token) {
-  return jwt.verify(token, process.env.JWT_SIGNUP_SECRET || process.env.JWT_REFRESH_SECRET || 'refreshsecret');
-}
 
 

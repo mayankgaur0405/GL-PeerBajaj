@@ -1,29 +1,32 @@
-// Email validation utility for GLBITM domain restriction
-const GLBITM_EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@glbitm\.ac\.in$/i;
+// Email validation utility - accepts any valid email domain
+const EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
-export const validateGLBITMEmail = (email) => {
+export const validateEmail = (email) => {
   if (!email) {
     return { isValid: false, message: 'Email is required' };
   }
   
-  if (!GLBITM_EMAIL_REGEX.test(email)) {
+  if (!EMAIL_REGEX.test(email)) {
     return { 
       isValid: false, 
-      message: 'Please use your college email ending with @glbitm.ac.in' 
+      message: 'Please enter a valid email address' 
     };
   }
   
   return { isValid: true, message: '' };
 };
 
+// Keep the old function name for backward compatibility
+export const validateGLBITMEmail = validateEmail;
+
 export const isGLBITMEmail = (email) => {
-  return GLBITM_EMAIL_REGEX.test(email);
+  return EMAIL_REGEX.test(email);
 };
 
 export const validateEmailForAuth = (emailOrUsername) => {
-  // If it looks like an email (contains @), validate the domain
+  // If it looks like an email (contains @), validate the email format
   if (emailOrUsername.includes('@')) {
-    return validateGLBITMEmail(emailOrUsername);
+    return validateEmail(emailOrUsername);
   }
   
   // If it's a username, it's valid

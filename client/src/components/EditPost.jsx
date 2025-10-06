@@ -50,7 +50,13 @@ export default function EditPost({ post, onUpdate, onCancel }) {
       };
 
       if (post.type === 'section') {
-        postData.section = formData.section;
+        postData.section = {
+          ...formData.section,
+          category: formData.section.category || undefined, // Don't send empty string
+          resources: formData.section.resources.filter(resource => 
+            resource.title.trim() && resource.link.trim()
+          ) // Only include resources with both title and link
+        };
       }
 
       if (post.type === 'image' && formData.images.length > 0) {
@@ -216,23 +222,25 @@ export default function EditPost({ post, onUpdate, onCancel }) {
           />
         </div>
 
-        {/* Category - Available for all post types */}
-        <div>
-          <label className="block text-sm font-medium text-white/80 mb-2">Category</label>
-          <select
-            value={formData.section.category}
-            onChange={(e) => setFormData(prev => ({
-              ...prev,
-              section: { ...prev.section, category: e.target.value }
-            }))}
-            className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select category</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
-        </div>
+        {/* Category - Only for Section/Roadmap posts */}
+        {post.type === 'section' && (
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">Category</label>
+            <select
+              value={formData.section.category}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                section: { ...prev.section, category: e.target.value }
+              }))}
+              className="w-full rounded-lg px-3 py-2 bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select category</option>
+              {categories.map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Section-specific fields */}
         {post.type === 'section' && (

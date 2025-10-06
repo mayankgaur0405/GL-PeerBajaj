@@ -358,14 +358,28 @@ export default function PostCard({ post, onUpdate, showActions = true, showFollo
           <img 
             src={post.author?.profilePicture || '/default-avatar.svg'} 
             alt={post.author?.name}
-            className="w-10 h-10 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400/50 transition-all"
+            onClick={() => navigate(`/profile/${post.author?._id}`)}
+            title="View profile"
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold truncate">{post.author?.name}</h3>
+              <h3 
+                className="font-semibold truncate cursor-pointer hover:text-blue-400 transition-colors"
+                onClick={() => navigate(`/profile/${post.author?._id}`)}
+                title="View profile"
+              >
+                {post.author?.name}
+              </h3>
               {post.author?.isVerified && <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600/20 text-blue-300">Verified</span>}
             </div>
-            <p className="text-xs text-white/60 truncate">@{post.author?.username}</p>
+            <p 
+              className="text-xs text-white/60 truncate cursor-pointer hover:text-blue-400 transition-colors"
+              onClick={() => navigate(`/profile/${post.author?._id}`)}
+              title="View profile"
+            >
+              @{post.author?.username}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-white/60">{formatDate(post.createdAt)}</span>
@@ -413,11 +427,11 @@ export default function PostCard({ post, onUpdate, showActions = true, showFollo
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mt-3">
             {post.tags.map((tag, index) => (
               <span 
                 key={index}
-                className="text-xs px-2 py-1 rounded-full border border-white/15 text-white/80"
+                className="text-xs px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 hover:bg-blue-500/30 transition-colors"
               >
                 #{tag}
               </span>

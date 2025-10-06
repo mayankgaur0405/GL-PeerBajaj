@@ -155,14 +155,6 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
 
   return (
     <div className="space-y-6">
-      <div className="section-header">
-        <span className="section-badge">📰</span>
-        <h3 className="text-white font-semibold">
-          {type === 'following' ? 'Following Feed' : 
-           type === 'global' ? 'Global Feed' : 
-           'Your Feed'}
-        </h3>
-      </div>
       {posts
         .filter(post => {
           // Additional client-side verification for global feed
@@ -183,19 +175,19 @@ export default function Feed({ type = 'feed', userId = null, filters = {} }) {
         ))}
 
       {loadingMore && (
-        <div className="text-center py-4">
-          <div className="inline-flex items-center gap-2 text-white/80">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/20 border-t-blue-600"></div>
-            <span>Loading more posts...</span>
+        <div className="text-center py-8">
+          <div className="inline-flex items-center gap-3 text-slate-600 dark:text-slate-300">
+            <div className="animate-spin rounded-full h-6 w-6 border-2 border-slate-200 dark:border-slate-600 border-t-blue-600"></div>
+            <span className="text-sm">Loading more posts...</span>
           </div>
         </div>
       )}
 
       {!hasMore && posts.length > 0 && (
-        <div className="text-center py-6">
-          <div className="inline-flex items-center gap-2 text-white/70">
-            <span>🎉</span>
-            <p>You\'ve reached the end of the feed</p>
+        <div className="text-center py-8">
+          <div className="inline-flex items-center gap-3 text-slate-500 dark:text-slate-400">
+            <span className="text-2xl">🎉</span>
+            <p className="text-sm">You've reached the end of the feed</p>
           </div>
         </div>
       )}

@@ -62,7 +62,7 @@ export default function Login() {
                 ? 'border-red-300 dark:border-red-500 focus:ring-red-500/60' 
                 : 'border-slate-300 dark:border-white/10 focus:ring-blue-500/60'
             }`}
-            placeholder="you@glbitm.ac.in or username" 
+            placeholder="your.email@example.com or username" 
             value={emailOrUsername} 
             onChange={(e)=>handleEmailOrUsernameChange(e.target.value)} 
           />

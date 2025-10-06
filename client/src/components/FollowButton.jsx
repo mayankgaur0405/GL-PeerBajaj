@@ -4,7 +4,7 @@ import api from '../lib/api.js';
 import { FaUserPlus, FaUserMinus } from 'react-icons/fa';
 
 export default function FollowButton({ userId, isFollowing: initialFollowing, onFollowChange }) {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [isFollowing, setIsFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
 
@@ -21,10 +21,28 @@ export default function FollowButton({ userId, isFollowing: initialFollowing, on
       if (isFollowing) {
         await api.delete(`/follow/${userId}`);
         setIsFollowing(false);
+        
+        // Update user context
+        if (updateUser) {
+          updateUser(prev => ({
+            ...prev,
+            following: prev.following?.filter(id => id !== userId) || []
+          }));
+        }
+        
         onFollowChange?.(false);
       } else {
         await api.post(`/follow/${userId}`);
         setIsFollowing(true);
+        
+        // Update user context
+        if (updateUser) {
+          updateUser(prev => ({
+            ...prev,
+            following: [...(prev.following || []), userId]
+          }));
+        }
+        
         onFollowChange?.(true);
       }
     } catch (error) {

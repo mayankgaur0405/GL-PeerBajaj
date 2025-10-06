@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useCreatePost } from '../context/CreatePostContext.jsx';
 import Feed from '../components/Feed.jsx';
-import CreatePost from '../components/CreatePost.jsx';
 import UserSuggestions from '../components/UserSuggestions.jsx';
+import api from '../lib/api.js';
 
 export default function FeedPage() {
   const { user } = useAuth();
+  const { openModal } = useCreatePost();
   const [activeFeed, setActiveFeed] = useState('following');
   const [activeFilter, setActiveFilter] = useState('all');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [contributors, setContributors] = useState([]);
 
   const filters = {
     all: {},
@@ -21,32 +24,115 @@ export default function FeedPage() {
     setRefreshKey(prev => prev + 1);
   };
 
+  // Fetch top contributors for stories
+  useEffect(() => {
+    const fetchContributors = async () => {
+      try {
+        const res = await api.get('/trending/contributors?limit=5');
+        if (res.data?.contributors?.length) {
+          setContributors(res.data.contributors);
+        }
+      } catch (err) {
+        console.error('Failed to fetch contributors:', err);
+      }
+    };
+    fetchContributors();
+  }, []);
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Feed */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Create Post */}
-          <CreatePost onPostCreated={handlePostCreated} />
-
-          {/* Feed Type Tabs */}
-          <div className="glass-card p-4">
-            <div className="tab-group mb-4">
-              {[
-                { key: 'following', label: 'Following Feed' },
-                { key: 'global', label: 'Global Feed' }
-              ].map(feed => (
-                <button
-                  key={feed.key}
-                  onClick={() => setActiveFeed(feed.key)}
-                  className={`tab-btn ${activeFeed === feed.key ? 'tab-btn-active' : ''}`}
-                >
-                  {feed.label}
-                </button>
-              ))}
+          {/* Learning Feed Header */}
+          <div className="glass-card p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xl">📚</span>
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Learning Feed</h2>
+                  <p className="text-sm text-white/70">Learn from seniors' experiences and insights</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
+                {/* Create Post Button */}
+                {user && (
+                  <button
+                    onClick={openModal}
+                    className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <span>✏️</span>
+                    <span>Create Post</span>
+                  </button>
+                )}
+                
+                {/* Feed Type Toggle */}
+                <div className="flex bg-white/10 rounded-lg p-1">
+                  {[
+                    { key: 'global', label: 'Global', icon: '🌍' },
+                    { key: 'following', label: 'Following', icon: '👥' }
+                  ].map(tab => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveFeed(tab.key)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                        activeFeed === tab.key
+                          ? 'bg-white/20 text-white shadow-sm'
+                          : 'text-white/70 hover:text-white'
+                      }`}
+                    >
+                      <span>{tab.icon}</span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             
-            {/* Filter Tabs */}
+            {/* Quick Stats */}
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-400">1,000+</div>
+                <div className="text-sm text-white/70">Students</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400">5,000+</div>
+                <div className="text-sm text-white/70">Posts</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-400">50+</div>
+                <div className="text-sm text-white/70">Topics</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stories Section */}
+          {user && (
+            <div className="glass-card p-4">
+              <div className="flex items-center space-x-4 overflow-x-auto pb-2">
+                <div className="flex-shrink-0 text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-700 dark:to-slate-600 rounded-full flex items-center justify-center mb-2 border-2 border-dashed border-gray-400 dark:border-slate-500">
+                    <span className="text-gray-500 dark:text-slate-400 text-xl">+</span>
+                  </div>
+                  <p className="text-xs text-white/70">Your Story</p>
+                </div>
+                {contributors.slice(0, 5).map((contributor, idx) => (
+                  <div key={idx} className="flex-shrink-0 text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-2 ring-2 ring-blue-500/30">
+                      <span className="text-white text-sm font-bold">{contributor.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                    </div>
+                    <p className="text-xs text-white/70 truncate w-16">{contributor.name}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Post Type Filters */}
+          <div className="glass-card p-4">
             <div className="tab-group">
               {[
                 { key: 'all', label: 'All Posts' },
@@ -78,53 +164,87 @@ export default function FeedPage() {
           {/* User Suggestions */}
           <UserSuggestions />
 
-          {/* Quick Stats */}
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Your Activity</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted">Posts</span>
-                <span className="font-medium text-white">{user?.totalPosts || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Followers</span>
-                <span className="font-medium text-white">{user?.followers?.length || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Following</span>
-                <span className="font-medium text-white">{user?.following?.length || 0}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Total Likes</span>
-                <span className="font-medium text-white">{user?.totalLikes || 0}</span>
-              </div>
-            </div>
-          </div>
-
           {/* Quick Actions */}
           <div className="glass-card p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
             <div className="space-y-2">
               <a
                 href="/trending"
-                className="block w-full text-left px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
+                className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
               >
-                🔥 Trending
+                <span className="text-xl">🔥</span>
+                <span>Trending Content</span>
               </a>
-              <a
-                href={`/profile/${user._id}`}
-                className="block w-full text-left px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                ⚙️ Profile
-              </a>
-              <a
-                href="/chat"
-                className="block w-full text-left px-4 py-2 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                💬 Messages
-              </a>
+              {user && (
+                <>
+                  <a
+                    href="/feed"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <span className="text-xl">📱</span>
+                    <span>Your Feed</span>
+                  </a>
+                  <a
+                    href="/chat"
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <span className="text-xl">💬</span>
+                    <span>Messages</span>
+                  </a>
+                  <a
+                    href={`/profile/${user._id}`}
+                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <span className="text-xl">⚙️</span>
+                    <span>Profile</span>
+                  </a>
+                </>
+              )}
             </div>
           </div>
+
+          {/* Top Contributors */}
+          <div className="glass-card p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Top Contributors</h3>
+            <div className="space-y-3">
+              {contributors.slice(0, 3).map((contributor, idx) => (
+                <div key={idx} className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    {idx + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-white">{contributor.name}</div>
+                    <div className="text-sm text-white/70">{contributor.posts ?? contributor.contributions ?? 0} posts</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Your Activity */}
+          {user && (
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Your Activity</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-white/70">Posts</span>
+                  <span className="font-medium text-white">{user?.totalPosts || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Followers</span>
+                  <span className="font-medium text-white">{user?.followers?.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Following</span>
+                  <span className="font-medium text-white">{user?.following?.length || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Total Likes</span>
+                  <span className="font-medium text-white">{user?.totalLikes || 0}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

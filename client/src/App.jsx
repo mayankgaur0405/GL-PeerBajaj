@@ -19,6 +19,10 @@ import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { SocketProvider } from './context/SocketContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { UnreadCountProvider } from './context/UnreadCountContext.jsx';
+import { CreatePostProvider, useCreatePost } from './context/CreatePostContext.jsx';
+import { ModeProvider } from './context/ModeContext.jsx';
+import { ToastProvider } from './context/ToastContext.jsx';
+import CreatePostModal from './components/CreatePostModal.jsx';
 
 // Private route component
 function PrivateRoute({ children }) {
@@ -29,54 +33,78 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" replace />;
 }
 
+function AppContent() {
+  const { isModalOpen, closeModal } = useCreatePost();
+
+  return (
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
+      <Navbar />
+      <main className="container mx-auto px-4 py-6 flex-1">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          
+          <Route path="/sitemap" element={<Sitemap />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/feed"
+            element={
+              <PrivateRoute>
+                <Feed />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/trending" element={<Trending />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/guide" element={<Guide />} />
+          <Route path="/editor/:roomId" element={<Editor />} />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <Chat />
+              </PrivateRoute>
+            }
+          />
+          {/* Post detail routes */}
+          <Route path="/roadmap/:id" element={<PostDetail />} />
+          <Route path="/blog/:id" element={<PostDetail />} />
+          <Route path="/image/:id" element={<PostDetail />} />
+          {/* Optional: Catch-all route */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      
+      {/* Global Create Post Modal */}
+      <CreatePostModal 
+        isOpen={isModalOpen} 
+        onClose={closeModal}
+        onPostCreated={() => {
+          // The modal handles redirection internally
+          // No need to refresh the page
+        }}
+      />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <SocketProvider>
           <UnreadCountProvider>
-            <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
-              <Navbar />
-              <main className="container mx-auto px-4 py-6 flex-1">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              
-              <Route path="/sitemap" element={<Sitemap />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route
-                path="/feed"
-                element={
-                  <PrivateRoute>
-                    <Feed />
-                  </PrivateRoute>
-                }
-              />
-              <Route path="/trending" element={<Trending />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/guide" element={<Guide />} />
-              <Route path="/editor/:roomId" element={<Editor />} />
-              <Route
-                path="/chat"
-                element={
-                  <PrivateRoute>
-                    <Chat />
-                  </PrivateRoute>
-                }
-              />
-              {/* Post detail routes */}
-              <Route path="/roadmap/:id" element={<PostDetail />} />
-              <Route path="/blog/:id" element={<PostDetail />} />
-              <Route path="/image/:id" element={<PostDetail />} />
-              {/* Optional: Catch-all route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-              </main>
-            </div>
+            <CreatePostProvider>
+              <ModeProvider>
+                <ToastProvider>
+                  <AppContent />
+                </ToastProvider>
+              </ModeProvider>
+            </CreatePostProvider>
           </UnreadCountProvider>
         </SocketProvider>
       </AuthProvider>
