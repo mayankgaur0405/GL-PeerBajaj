@@ -4,7 +4,7 @@ import api from '../lib/api.js';
 import { useNavigate } from 'react-router-dom';
 
 export default function UserSuggestions() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,15 +13,21 @@ export default function UserSuggestions() {
   useEffect(() => {
     fetchSuggestions();
     if (user) {
-      setFollowing(new Set(user.following?.map(f => f._id) || []));
+      const ids = new Set((user.following || []).map(f => (typeof f === 'string' ? f : f._id)));
+      setFollowing(ids);
+    } else {
+      setFollowing(new Set());
     }
   }, [user]);
 
   const fetchSuggestions = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/users/suggest?limit=4');
-      setSuggestions(response.data.users || []);
+      const response = await api.get('/users/suggest?limit=8');
+      const all = response.data.users || [];
+      const followingSet = new Set((user?.following || []).map(f => (typeof f === 'string' ? f : f._id)));
+      const filtered = all.filter(u => u._id !== user?._id && !followingSet.has(u._id));
+      setSuggestions(filtered.slice(0, 4));
     } catch (err) {
       console.error('Failed to fetch suggestions:', err);
     } finally {
@@ -33,6 +39,11 @@ export default function UserSuggestions() {
     try {
       await api.post(`/users/${userId}/follow`);
       setFollowing(prev => new Set([...prev, userId]));
+      setSuggestions(prev => prev.filter(u => u._id !== userId));
+      if (updateUser && user) {
+        const nextFollowing = [...(user.following || []), userId];
+        updateUser({ ...user, following: nextFollowing });
+      }
     } catch (err) {
       console.error('Failed to follow user:', err);
     }
@@ -46,6 +57,14 @@ export default function UserSuggestions() {
         newSet.delete(userId);
         return newSet;
       });
+      // Optionally, re-add to suggestions after unfollow
+      fetchSuggestions();
+      if (updateUser && user) {
+        const nextFollowing = (user.following || [])
+          .map(f => (typeof f === 'string' ? f : f._id))
+          .filter(id => id !== userId);
+        updateUser({ ...user, following: nextFollowing });
+      }
     } catch (err) {
       console.error('Failed to unfollow user:', err);
     }

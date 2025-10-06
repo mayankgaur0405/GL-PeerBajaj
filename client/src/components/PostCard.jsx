@@ -24,6 +24,8 @@ export default function PostCard({ post, onUpdate, showActions = true, showFollo
   const [showResources, setShowResources] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [deletingComment, setDeletingComment] = useState(null);
+  const [lastTapTime, setLastTapTime] = useState(0);
+  const [showHeart, setShowHeart] = useState(false);
 
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -76,6 +78,26 @@ export default function PostCard({ post, onUpdate, showActions = true, showFollo
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const triggerLikeWithAnim = () => {
+    // Avoid spamming like while a request is in flight
+    if (isLoading) return;
+    handleLike();
+    setShowHeart(true);
+    setTimeout(() => setShowHeart(false), 650);
+  };
+
+  const handleDoubleClick = () => {
+    triggerLikeWithAnim();
+  };
+
+  const handleTouchEnd = () => {
+    const now = Date.now();
+    if (now - lastTapTime < 300) {
+      triggerLikeWithAnim();
+    }
+    setLastTapTime(now);
   };
 
   const handleComment = async (e) => {
@@ -422,8 +444,17 @@ export default function PostCard({ post, onUpdate, showActions = true, showFollo
           {post.section?.title || post.title || 'Untitled Post'}
         </h2>
 
-        {/* Post Content */}
-        {renderPostContent()}
+        {/* Post Content with double-tap like */}
+        <div className="relative" onDoubleClick={handleDoubleClick} onTouchEnd={handleTouchEnd}>
+          {renderPostContent()}
+          {showHeart && (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <svg className="w-20 h-20 text-red-500 opacity-90 animate-ping" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.462 2.25 9a4.5 4.5 0 018.59-1.657h.318A4.5 4.5 0 0119.75 9c0 3.462-2.438 6.36-4.739 8.507a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003-.003.002a.75.75 0 01-.698 0l-.003-.002z"/>
+              </svg>
+            </div>
+          )}
+        </div>
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (

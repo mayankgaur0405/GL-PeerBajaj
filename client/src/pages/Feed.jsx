@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useCreatePost } from '../context/CreatePostContext.jsx';
 import Feed from '../components/Feed.jsx';
+import LeftRail from '../components/LeftRail.jsx';
 import UserSuggestions from '../components/UserSuggestions.jsx';
 import api from '../lib/api.js';
 
@@ -40,10 +41,15 @@ export default function FeedPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Feed */}
-        <div className="lg:col-span-2 space-y-6">
+    <div className="max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mt-16">
+        {/* Left Rail */}
+        <div className="hidden lg:block">
+          <LeftRail />
+        </div>
+
+        {/* Main Feed - widest */}
+        <div className="lg:col-span-4 space-y-6">
           {/* Learning Feed Header */}
           <div className="glass-card p-6">
             <div className="flex items-center justify-between mb-4">
@@ -109,6 +115,55 @@ export default function FeedPage() {
             </div>
           </div>
 
+          {/* Header widgets row: Suggested, Contributors, Activity */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Suggested for you */}
+            <UserSuggestions />
+
+            {/* Top Contributors */}
+            <div className="glass-card p-6 hover-glow hover-raise transition-transform">
+              <h3 className="text-lg font-semibold text-white mb-4">Top Contributors</h3>
+              <div className="space-y-3">
+                {contributors.slice(0, 3).map((contributor, idx) => (
+                  <div key={idx} className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-white">{contributor.name}</div>
+                      <div className="text-sm text-white/70">{contributor.posts ?? contributor.contributions ?? 0} posts</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Your Activity */}
+            {user ? (
+              <div className="glass-card p-6 hover-glow hover-raise transition-transform">
+                <h3 className="text-lg font-semibold text-white mb-4">Your Activity</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Posts</span>
+                    <span className="font-medium text-white">{user?.totalPosts || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Followers</span>
+                    <span className="font-medium text-white">{user?.followers?.length || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Following</span>
+                    <span className="font-medium text-white">{user?.following?.length || 0}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="glass-card p-6 hover-glow hover-raise transition-transform flex items-center justify-center text-white/70">
+                Sign in to view your activity
+              </div>
+            )}
+          </div>
+
           {/* Stories Section */}
           {user && (
             <div className="glass-card p-4">
@@ -159,94 +214,19 @@ export default function FeedPage() {
           />
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* User Suggestions */}
-          <UserSuggestions />
-
-          {/* Quick Actions */}
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-            <div className="space-y-2">
-              <a
-                href="/trending"
-                className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <span className="text-xl">🔥</span>
-                <span>Trending Content</span>
-              </a>
-              {user && (
-                <>
-                  <a
-                    href="/feed"
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <span className="text-xl">📱</span>
-                    <span>Your Feed</span>
-                  </a>
-                  <a
-                    href="/chat"
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <span className="text-xl">💬</span>
-                    <span>Messages</span>
-                  </a>
-                  <a
-                    href={`/profile/${user._id}`}
-                    className="flex items-center space-x-3 w-full text-left px-4 py-3 text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <span className="text-xl">⚙️</span>
-                    <span>Profile</span>
-                  </a>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Top Contributors */}
-          <div className="glass-card p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Top Contributors</h3>
-            <div className="space-y-3">
-              {contributors.slice(0, 3).map((contributor, idx) => (
-                <div key={idx} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {idx + 1}
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-white">{contributor.name}</div>
-                    <div className="text-sm text-white/70">{contributor.posts ?? contributor.contributions ?? 0} posts</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Your Activity */}
-          {user && (
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Your Activity</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-white/70">Posts</span>
-                  <span className="font-medium text-white">{user?.totalPosts || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/70">Followers</span>
-                  <span className="font-medium text-white">{user?.followers?.length || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/70">Following</span>
-                  <span className="font-medium text-white">{user?.following?.length || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-white/70">Total Likes</span>
-                  <span className="font-medium text-white">{user?.totalLikes || 0}</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* No right sidebar; content moved into LeftRail */}
       </div>
+
+      {/* Floating Create Button (desktop + mobile) */}
+      {user && (
+        <button
+          onClick={openModal}
+          className="fixed bottom-6 right-6 z-40 shadow-lg rounded-full px-5 py-3 bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2"
+        >
+          <span>✏️</span>
+          <span className="hidden sm:inline">Create</span>
+        </button>
+      )}
     </div>
   );
 }

@@ -103,7 +103,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {/* Mode Toggle */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-white/70">Mode:</span>
+            {/* <span className="text-sm text-white/70">Mode:</span> */}
             <button
               onClick={toggleMode}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${
