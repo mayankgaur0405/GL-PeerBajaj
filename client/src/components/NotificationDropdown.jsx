@@ -161,7 +161,7 @@ export default function NotificationDropdown({ isOpen, onClose, onUnreadCountCha
   return (
     <div 
       ref={dropdownRef}
-      className="absolute top-full right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 z-50 max-h-96 overflow-hidden"
+      className="absolute top-full right-0 mt-2 w-full sm:w-96 max-w-[92vw] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 z-50 max-h-96 overflow-hidden"
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-slate-700">
